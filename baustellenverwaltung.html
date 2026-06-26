@@ -164,6 +164,8 @@ input:focus,select:focus,textarea:focus{border-color:#2d5a8e;box-shadow:0 0 0 3p
 .multisel-item input[type=checkbox]{width:15px;height:15px;accent-color:#1a3a5c;cursor:pointer;flex-shrink:0}
 .g-today{position:absolute;top:0;bottom:0;width:2px;background:#e8a020;z-index:15;pointer-events:none}
 .g-today-lbl{position:absolute;top:3px;left:4px;font-size:9px;background:#e8a020;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;white-space:nowrap;z-index:16}
+.g-datemark{position:absolute;top:0;bottom:0;width:2px;background:#dc2626;z-index:15;pointer-events:none}
+.g-datemark-lbl{position:absolute;top:3px;left:4px;font-size:9px;background:#dc2626;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;white-space:nowrap;z-index:16}
 .g-grid-week{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.055);pointer-events:none;z-index:1}
 .g-grid-month{position:absolute;top:0;bottom:0;width:1px;background:rgba(30,58,92,.22);pointer-events:none;z-index:2}
 .g-filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px;padding:10px 12px;background:#f8faff;border-radius:8px;border:1px solid #e8edf4}
@@ -432,6 +434,11 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
       <span class="g-flag on" id="gf-bko" style="--fc:#e65100" onclick="toggleGFlag('gf-bko')">🏗️ Obendreher</span>
       <span class="g-flag on" id="gf-bku" style="--fc:#880e4f" onclick="toggleGFlag('gf-bku')">🏗️ Untendreher</span>
       <span class="g-flag on" id="gf-today" style="--fc:#e8a020" onclick="toggleGFlag('gf-today')">📍 Heute</span>
+      <label style="font-size:12px;color:#64748b;margin-left:10px;display:flex;align-items:center;gap:5px">
+        <span style="color:#dc2626;font-weight:700">📍 Stichtag</span>
+        <input type="date" id="g-stichtag" style="font-size:12px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:4px;cursor:pointer" onchange="renderGantt()">
+        <button onclick="document.getElementById('g-stichtag').value='';renderGantt()" style="font-size:11px;background:none;border:1px solid #cbd5e1;border-radius:4px;padding:1px 6px;cursor:pointer;color:#64748b" title="Stichtag löschen">✕</button>
+      </label>
     </div>
     <div class="legend">
       <div class="leg"><div class="leg-dot" style="background:#37474f"></div>Projekt</div>
@@ -1629,6 +1636,11 @@ function renderGantt(){
   if(viewMode==='week'){for(let i=0;i<totalWks;i++){const d=new Date(minMs+i*WK),ws=d2w(d);const[,wn]=ws.split('-W'),wni=+wn,isNew=wni<=1||i===0;wkHdr+=`<div class="gh-wk${isNew?' ms':''}" style="width:${WPX}px">${isNew?`KW${wni}'${String(d.getFullYear()).slice(2)}`:`KW${wni}`}</div>`;}}
   else{let i=0;while(i<totalWks){const d=new Date(minMs+i*WK),mo=d.getMonth(),yr=d.getFullYear();let cnt=0,j=i;while(j<totalWks){const dd=new Date(minMs+j*WK);if(dd.getMonth()===mo&&dd.getFullYear()===yr){cnt++;j++;}else break;}const mName=d.toLocaleDateString('de-DE',{month:'short'});const yS=`'${String(yr).slice(2)}`;wkHdr+=`<div class="gh-wk ms" style="width:${cnt*WPX}px;font-size:${WPX<16?'9px':'10px'}">${mName}${(i===0||mo===0)?' '+yS:''}</div>`;i+=cnt;}}
   function todayLine(){if(!gFlag('gf-today')||!showTodayCalc)return'';return`<div class="g-today" style="left:${todayX}px"><div class="g-today-lbl">Heute</div></div>`;}
+  const stichtagVal=document.getElementById('g-stichtag')?.value;
+  const stichtagMs=stichtagVal?new Date(stichtagVal+'T00:00:00').getTime():null;
+  const stichtagX=stichtagMs?Math.round((stichtagMs-minMs)/WK)*WPX:null;
+  const showStichtag=stichtagMs&&stichtagMs>minMs&&stichtagMs<maxMs;
+  function stichtagLine(){if(!showStichtag)return'';const lbl=new Date(stichtagVal+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});return`<div class="g-datemark" style="left:${stichtagX}px"><div class="g-datemark-lbl">${lbl}</div></div>`;}
   // ── Vertical grid lines ───────────────────────────────────────────
   function barEndDate(startWS,dur){const sd=w2dateStr(startWS);if(!sd)return'';const d=new Date(sd+'T00:00:00');d.setDate(d.getDate()+(dur||1)*7);return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});}
   let gridHtml='';
@@ -1657,7 +1669,7 @@ function renderGantt(){
     else if(row.t==='bk'){const nm=bkName(row.a.id),tp=bkTyp(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=tp==='Obendreher'?'gc-bko':'gc-bku';lbl=`<span style="color:${col}">🏗️ ${nm} <span class="sub">(${tp})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${nm} (${tp})\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     if(row.t!=='proj'&&(row.p?.status||'auftrag')==='potenzial')bc+=' gc-potenzial';
     const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):bkName(row.a.id);
-    return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}</div></div>`;
+    return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}${stichtagLine()}</div></div>`;
   }
   out.innerHTML=`<div class="gantt-outer"><div class="gantt-inner" style="width:${LBL_W+timeW+2}px"><div class="gh-row"><div class="gh-lbl" style="width:${LBL_W}px">Bezeichnung</div><div class="gh-wks" style="width:${timeW}px">${wkHdr}</div></div>${rows.map(rowHtml).join('')}</div></div>`;
 }
