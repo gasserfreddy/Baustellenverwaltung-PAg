@@ -133,6 +133,7 @@ input:focus,select:focus,textarea:focus{border-color:#2d5a8e;box-shadow:0 0 0 3p
 .gc-proj{background:#37474f}.gc-pl{background:#1565c0}.gc-polier{background:#6d28d9}
 .gc-va{background:#2e7d32}.gc-gf{background:#d97706}.gc-bko{background:#e65100}.gc-bku{background:#880e4f}
 .gc-proj-potenzial{background:repeating-linear-gradient(45deg,#78909c,#78909c 4px,#b0bec5 4px,#b0bec5 9px);color:#fff;border:2px dashed #546e7a}
+.gc-potenzial{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0),rgba(255,255,255,0) 4px,rgba(255,255,255,0.38) 4px,rgba(255,255,255,0.38) 9px)!important;border:2px dashed rgba(255,255,255,0.65)!important;}
 .tr-potenzial td{background:#fffbeb!important}.tr-potenzial:hover td{background:#fef3c7!important}
 .b-auftrag{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}.b-potenzial{background:#fef3c7;color:#92400e;border:1px solid #fde68a}.b-abgeschlossen{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1}
 .status-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content}
@@ -1456,10 +1457,10 @@ function saveProject(){
     S.proj.forEach(p=>{
       if(S.editing&&p.id===S.editing)return;// eigenes Projekt ausschließen
       (p.bk||[]).forEach(eb=>{
-        if(eb.id!==bk.id)return;
+        if(+eb.id!==+bk.id)return;
         const bMs=w2ms(eb.start);const bEnd=bMs+(eb.dauer||1)*WK;
         if(aMs<bEnd&&bMs<aEnd){
-          const kranItem=S.bk.find(x=>x.id===bk.id);
+          const kranItem=S.bk.find(x=>+x.id===+bk.id);
           const kranName=kranItem?kranItem.name:`Kran #${bk.id}`;
           const endWk=d2w(new Date(bEnd));
           bkConflicts.push(`🏗️ ${kranName}  →  Projekt "${p.name}" (${fmtW(eb.start)} – ${fmtW(endWk)})`);
@@ -1605,6 +1606,7 @@ function renderGantt(){
     else if(row.t==='pl'){const nm=plName(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);lbl=`<span style="color:#1565c0">👷 ${nm}</span>`;bc='gc-pl';bs=barLeft(row.a.start,row.a.dauer||1);bt=`PL: ${nm}\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     else if(row.t==='va'){const nm=vaName(row.a.id),rl=vaRole(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=rl==='Polier'?'#6d28d9':rl==='Gruppenführer'?'#d97706':'#2e7d32';bc=rl==='Polier'?'gc-polier':rl==='Gruppenführer'?'gc-gf':'gc-va';lbl=`<span style="color:${col}">${roleIcon(rl)} ${nm} <span class="sub">(${rl})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${rl}: ${nm}\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     else if(row.t==='bk'){const nm=bkName(row.a.id),tp=bkTyp(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=tp==='Obendreher'?'gc-bko':'gc-bku';lbl=`<span style="color:${col}">🏗️ ${nm} <span class="sub">(${tp})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${nm} (${tp})\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
+    if(row.t!=='proj'&&(row.p?.status||'auftrag')==='potenzial')bc+=' gc-potenzial';
     const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):bkName(row.a.id);
     return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}</div></div>`;
   }
