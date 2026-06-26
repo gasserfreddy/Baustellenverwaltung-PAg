@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -265,14 +265,6 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
-
-<!--[if gte mso 9]><xml>
-<mso:CustomDocumentProperties>
-<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocId>
-<mso:_dlc_DocIdItemGuid msdt:dt="string">1c7fd022-81ab-4013-bdf3-21596c929b71</mso:_dlc_DocIdItemGuid>
-<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-925467, D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocIdUrl>
-</mso:CustomDocumentProperties>
-</xml><![endif]-->
 </head>
 <body>
 
@@ -1029,7 +1021,7 @@ function _jbPush(){
   clearTimeout(_jbTimer);
   _jbTimer=setTimeout(()=>{
     _jbStatus('saving');
-    fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload()})
+    fetch(FB_URL,{method:'PUT',body:_statePayload()})
       .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);_jbStatus('ok');})
       .catch(()=>_jbStatus('error'));
   },600);
@@ -1123,7 +1115,7 @@ function importJSON(){
         _applyData(d);
         // Sofort ohne Debounce in Cloud speichern und Ergebnis anzeigen
         _jbStatus('saving');
-        fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload()})
+        fetch(FB_URL,{method:'PUT',body:_statePayload()})
           .then(res=>{
             if(!res.ok)return res.text().then(t=>{throw new Error('HTTP '+res.status+': '+t);});
             _jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');
@@ -1873,7 +1865,7 @@ function confirmPinDelete(){
   closePinModal();
   if(action==='reset'){
     const empty={pl:[],va:[],bk:[],proj:[],ids:{pl:1,va:1,bk:1,proj:1}};
-    fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(empty)}).catch(()=>{});
+    fetch(FB_URL,{method:'PUT',body:JSON.stringify(empty)}).catch(()=>{});
     localStorage.removeItem(APP_KEY);location.reload();
   }
   else if(action==='delete'||action==='delProj'){
