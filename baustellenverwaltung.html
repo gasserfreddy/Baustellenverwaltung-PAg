@@ -1030,12 +1030,14 @@ function _jbPush(){
 async function jbLoad(){
   _jbStatus('loading');
   try{
-    const r=await fetch(JB_URL+'/latest',{headers:{'X-Master-Key':JB_KEY,'X-Bin-Meta':'false'}});
+    const r=await fetch(JB_URL,{headers:{'X-Master-Key':JB_KEY,'X-Bin-Meta':'false'}});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    if(d&&d.proj!==undefined){_applyData(d);showToast('☁️ Daten aktualisiert');}
+    if(d&&d.proj!==undefined&&(d.proj.length||d.pl.length||d.bk.length||d.va.length)){
+      _applyData(d);showToast('☁️ Daten aktualisiert');
+    }
     _jbStatus('ok');
-  }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar – lokale Daten werden angezeigt');}
+  }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar ('+e.message+')');}
 }
 
 let _fsHandle=null;
@@ -1109,8 +1111,18 @@ function importJSON(){
   inp.onchange=e=>{
     const f=e.target.files[0];if(!f)return;
     const r=new FileReader();r.onload=ev=>{
-      try{_applyData(JSON.parse(ev.target.result));showToast('✅ Daten importiert');}
-      catch{showToast('⚠️ Ungültige Datei – kein gültiges JSON');}
+      try{
+        const d=JSON.parse(ev.target.result);
+        _applyData(d);
+        // Sofort ohne Debounce in Cloud speichern und Ergebnis anzeigen
+        _jbStatus('saving');
+        fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'},body:_statePayload()})
+          .then(res=>{
+            if(!res.ok)return res.text().then(t=>{throw new Error('HTTP '+res.status+': '+t);});
+            _jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');
+          })
+          .catch(err=>{_jbStatus('error');showToast('⚠️ Lokal geladen, Cloud-Fehler: '+err.message);});
+      }catch{showToast('⚠️ Ungültige Datei – kein gültiges JSON');}
     };r.readAsText(f);
   };inp.click();
 }
