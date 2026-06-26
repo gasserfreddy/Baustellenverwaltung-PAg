@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -265,6 +265,14 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">1c7fd022-81ab-4013-bdf3-21596c929b71</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-925467, D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
 
@@ -1006,11 +1014,9 @@ let rowCtr=0;
 const APP_KEY='bauapp_v2';
 
 // ================================================================
-// CLOUD SYNC — JSONbin.io
+// CLOUD SYNC — Firebase Realtime Database
 // ================================================================
-const JB_KEY='$2a$10$8F1d5svzaDlz85GOP/BcnO3ABocZy0SV7LvoTPLtZMBHf.OzC4s5e';
-const JB_BIN='6a3d2cc5da38895dfefd64af';
-const JB_URL=`https://api.jsonbin.io/v3/b/${JB_BIN}`;
+const FB_URL='https://bauapp-e79ac-default-rtdb.europe-west1.firebasedatabase.app/baudata.json';
 let _jbTimer=null;
 
 function _jbStatus(st){
@@ -1023,15 +1029,15 @@ function _jbPush(){
   clearTimeout(_jbTimer);
   _jbTimer=setTimeout(()=>{
     _jbStatus('saving');
-    fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'},body:_statePayload()})
-      .then(r=>{if(!r.ok)throw new Error();_jbStatus('ok');})
+    fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload()})
+      .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);_jbStatus('ok');})
       .catch(()=>_jbStatus('error'));
-  },600);// 600ms debounce – nicht bei jedem Tastendruck senden
+  },600);
 }
 async function jbLoad(){
   _jbStatus('loading');
   try{
-    const r=await fetch(JB_URL,{headers:{'X-Master-Key':JB_KEY,'X-Bin-Meta':'false'}});
+    const r=await fetch(FB_URL);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     if(d&&d.proj!==undefined&&(d.proj.length||d.pl.length||d.bk.length||d.va.length)){
@@ -1117,7 +1123,7 @@ function importJSON(){
         _applyData(d);
         // Sofort ohne Debounce in Cloud speichern und Ergebnis anzeigen
         _jbStatus('saving');
-        fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'},body:_statePayload()})
+        fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload()})
           .then(res=>{
             if(!res.ok)return res.text().then(t=>{throw new Error('HTTP '+res.status+': '+t);});
             _jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');
@@ -1867,7 +1873,7 @@ function confirmPinDelete(){
   closePinModal();
   if(action==='reset'){
     const empty={pl:[],va:[],bk:[],proj:[],ids:{pl:1,va:1,bk:1,proj:1}};
-    fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Versioning':'false'},body:JSON.stringify(empty)}).catch(()=>{});
+    fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(empty)}).catch(()=>{});
     localStorage.removeItem(APP_KEY);location.reload();
   }
   else if(action==='delete'||action==='delProj'){
