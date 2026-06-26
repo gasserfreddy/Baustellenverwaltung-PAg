@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -265,6 +265,14 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">1c7fd022-81ab-4013-bdf3-21596c929b71</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-925467, D7FFDUNRZZQD-1481149271-925467</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
 
@@ -279,6 +287,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
     <button class="btn bg btn-sm" onclick="jbLoad()" title="Aktuelle Daten von allen Mitarbeitern laden">🔄 Aktualisieren</button>
     <button class="btn bg btn-sm" onclick="exportJSON()" title="Daten als JSON-Backup herunterladen">⬇️ Backup</button>
     <button class="btn bg btn-sm" onclick="importJSON()" title="Daten aus JSON-Backup wiederherstellen">⬆️ Wiederherstellen</button>
+    <button class="btn bg btn-sm" onclick="document.getElementById('modal-hilfe').classList.add('open')" title="Bedienungsanleitung">❓ Hilfe</button>
     <button class="btn bg btn-sm" onclick="toggleLang()" id="btn-lang">🇩🇪 DE</button>
     <button class="btn bd btn-sm" onclick="avShowPinModal('reset')" style="font-size:11px;opacity:.7">🗑 Reset</button>
   </div>
@@ -548,6 +557,48 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div class="mfoot">
     <button class="btn bg" onclick="resetForm()">↺ Zurücksetzen</button>
     <button class="btn ba" onclick="saveProject()">💾 Speichern</button>
+  </div>
+</div>
+</div>
+
+<!-- Hilfe Modal -->
+<div class="overlay" id="modal-hilfe" onclick="if(event.target===this)document.getElementById('modal-hilfe').classList.remove('open')">
+<div class="modal" style="max-width:680px;max-height:85vh;overflow-y:auto">
+  <div class="mhd"><div class="mtitle">❓ Bedienungsanleitung</div><button class="mclose" onclick="document.getElementById('modal-hilfe').classList.remove('open')">✕</button></div>
+  <div style="padding:20px 24px;line-height:1.7;font-size:14px">
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">Zugang zur App</h3>
+    <p style="margin:0 0 4px">Den Link in den Browser-Favoriten speichern. Funktioniert mit Chrome, Edge und Safari auf PC, Mac und iPad.</p>
+    <p style="margin:0 0 16px">Beim Öffnen erscheint oben rechts <strong>⏳ Laden…</strong> — sobald <strong>☁️ Gespeichert</strong> erscheint, sind alle aktuellen Daten geladen.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">Bereiche der App</h3>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
+      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Projektleiter</td><td style="padding:6px 10px">Liste aller Projektleiter verwalten</td></tr>
+      <tr><td style="padding:6px 10px;font-weight:600">Vorarbeiter</td><td style="padding:6px 10px">Vorarbeiter, Poliere und Gruppenführer</td></tr>
+      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Baukräne</td><td style="padding:6px 10px">Verfügbare Baukräne verwalten</td></tr>
+      <tr><td style="padding:6px 10px;font-weight:600">Projekte</td><td style="padding:6px 10px">Baustellen anlegen und bearbeiten</td></tr>
+      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Gantt</td><td style="padding:6px 10px">Grafische Übersicht aller Projekte und Ressourcen</td></tr>
+    </table>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">Projekt anlegen / bearbeiten</h3>
+    <p style="margin:0 0 4px"><strong>Neu:</strong> Tab Projekte → <em>+ Neues Projekt</em> → Felder ausfüllen → Speichern</p>
+    <p style="margin:0 0 4px"><strong>Bearbeiten:</strong> In der Projektliste auf ✏️ klicken → Änderungen → Speichern</p>
+    <p style="margin:0 0 16px"><strong>Löschen:</strong> 🗑️ Löschen → PIN eingeben: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">pl01</code></p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">Gantt-Diagramm</h3>
+    <p style="margin:0 0 4px">Filter oben links: nach Baustelle, Projektleiter, Vorarbeiter oder Baukran filtern.</p>
+    <p style="margin:0 0 4px">Ansicht: zwischen Wochen- und Monatsansicht wechseln. Strichlierte Balken = Potenziales Projekt.</p>
+    <p style="margin:0 0 16px">Mit <em>Als PDF drucken</em> → Format A4 oder A3 wählen.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">Cloud-Status (oben rechts)</h3>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
+      <tr style="background:#f1f5f9"><td style="padding:5px 10px">⏳ Laden…</td><td style="padding:5px 10px">Daten werden aus der Cloud geladen</td></tr>
+      <tr><td style="padding:5px 10px">💾 Speichern…</td><td style="padding:5px 10px">Daten werden gespeichert</td></tr>
+      <tr style="background:#f1f5f9"><td style="padding:5px 10px">☁️ Gespeichert</td><td style="padding:5px 10px">Alles aktuell — kein manuelles Speichern nötig</td></tr>
+      <tr><td style="padding:5px 10px">⚠️ Offline</td><td style="padding:5px 10px">Keine Cloud-Verbindung</td></tr>
+    </table>
+
+    <p style="margin:0;font-size:12px;color:#64748b">Änderungen eines Mitarbeiters sind für alle anderen nach Klick auf 🔄 Aktualisieren sichtbar. Bei Doppelbelegung eines Baukrans erscheint automatisch eine Warnung.</p>
   </div>
 </div>
 </div>
