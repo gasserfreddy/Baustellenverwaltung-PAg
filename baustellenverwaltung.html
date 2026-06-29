@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -179,8 +179,9 @@ input:focus,select:focus,textarea:focus{border-color:#2d5a8e;box-shadow:0 0 0 3p
 #login-err{color:#dc2626;font-size:13px;margin-top:8px;min-height:18px}
 #login-loading{color:#64748b;font-size:14px;padding:10px 0}
 /* BENUTZERVERWALTUNG */
-.user-row{display:grid;grid-template-columns:1fr 1fr 36px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.user-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9}
 .user-row:last-child{border-bottom:none}
+.user-row input{padding:4px 8px;border:1px solid #cbd5e1;border-radius:5px;font-size:13px;width:100%;box-sizing:border-box}
 .g-grid-week{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.055);pointer-events:none;z-index:1}
 .g-grid-month{position:absolute;top:0;bottom:0;width:1px;background:rgba(30,58,92,.22);pointer-events:none;z-index:2}
 .g-filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px;padding:10px 12px;background:#f8faff;border-radius:8px;border:1px solid #e8edf4}
@@ -282,6 +283,14 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">ab50b1d9-e42a-4ba1-9882-f18bde6161a2</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-926040, D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
 
@@ -307,10 +316,14 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div style="padding:16px 20px">
     <p style="margin:0 0 12px;font-size:13px;color:#64748b">Mitarbeiter mit Zugang zur App. Jeder Eintrag erhält ein individuelles Kennwort.</p>
     <div id="users-list"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:14px;align-items:end">
-      <div><label class="lbl">Name</label><input class="inp" id="u-name" placeholder="Hans Muster"></div>
-      <div><label class="lbl">Kennwort</label><input class="inp" id="u-pw" placeholder="z.B. bau2025"></div>
-      <button class="btn bg" onclick="addUser()" style="align-self:end">+ Hinzufügen</button>
+    <div style="border-top:1px solid #e2e8f0;margin-top:12px;padding-top:12px">
+      <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px" id="u-form-lbl">Neuer Benutzer</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end">
+        <div><label class="lbl">Name</label><input class="inp" id="u-name" placeholder="Hans Muster"></div>
+        <div><label class="lbl">Kennwort</label><input class="inp" id="u-pw" placeholder="z.B. bau2025"></div>
+        <button class="btn bg" id="u-save-btn" onclick="addUser()" style="align-self:end">+ Hinzufügen</button>
+      </div>
+      <button id="u-cancel-btn" class="btn" style="display:none;margin-top:6px;font-size:12px" onclick="_userFormMode('add');document.getElementById('u-name').value='';document.getElementById('u-pw').value=''">✕ Abbrechen</button>
     </div>
     <p style="margin:14px 0 0;font-size:11px;color:#94a3b8">⚠️ Solange keine Benutzer angelegt sind, ist die App ohne Login zugänglich.</p>
   </div>
@@ -2004,7 +2017,6 @@ function confirmPinDelete(){
   else if(action==='delBK'){S.bk=S.bk.filter(x=>x.id!==payload);_sdReset('bk');saveState();renderBK();showToast('🗑️ Baukran gelöscht');}
   else if(action==='delArchiv'){S.proj=S.proj.filter(p=>p.id!==payload);saveState();renderArchiv();showToast('🗑️ Archiveintrag gelöscht');}
   else if(action==='openUsers'){document.getElementById('modal-users').classList.add('open');renderUsers();}
-  else if(action==='delUser'){S.users=S.users.filter(u=>u.id!==payload);saveState();renderUsers();showToast('🗑️ Benutzer gelöscht');}
 }
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPinDelete();});
 
@@ -2252,7 +2264,11 @@ function checkLoginRequired(){
   const frm=document.getElementById('login-form');
   const ldg=document.getElementById('login-loading');
   if(S.users.length===0){ov.style.display='none';return;}
-  if(sessionStorage.getItem('bau_logged')==='1'){ov.style.display='none';return;}
+  const storedPw=sessionStorage.getItem('bau_user_pw');
+  const stillValid=storedPw&&S.users.find(u=>u.pw===storedPw);
+  if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){ov.style.display='none';return;}
+  // Session ungültig (Benutzer gelöscht) → neu anmelden
+  sessionStorage.removeItem('bau_logged');sessionStorage.removeItem('bau_user_pw');
   ov.style.display='flex';ldg.style.display='none';frm.style.display='block';
   setTimeout(()=>document.getElementById('login-pw')?.focus(),100);
 }
@@ -2262,18 +2278,68 @@ function doLogin(){
   const match=S.users.find(u=>u.pw===pw);
   if(!match){err.textContent='❌ Falsches Kennwort';document.getElementById('login-pw').value='';document.getElementById('login-pw').focus();return;}
   sessionStorage.setItem('bau_logged','1');
+  sessionStorage.setItem('bau_user_pw',match.pw);
   document.getElementById('login-overlay').style.display='none';
   err.textContent='';
   showToast('👋 Willkommen, '+match.name+'!');
 }
+let _editUserIdx=null;
 function renderUsers(){
   const list=document.getElementById('users-list');if(!list)return;
-  if(!S.users.length){list.innerHTML='<p style="color:#94a3b8;font-size:13px;margin:0">Noch keine Benutzer angelegt.</p>';return;}
-  list.innerHTML=S.users.map(u=>`<div class="user-row">
+  if(!S.users.length){
+    list.innerHTML='<p style="color:#94a3b8;font-size:13px;margin:8px 0">Noch keine Benutzer angelegt.</p>';
+    _editUserIdx=null;_userFormMode('add');return;
+  }
+  list.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:4px 0 6px;border-bottom:2px solid #e2e8f0;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase"><span>Name</span><span>Kennwort</span><span></span></div>`+
+  S.users.map((u,i)=>`<div class="user-row">
     <span style="font-weight:600">${esc(u.name)}</span>
     <span style="font-family:monospace;background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:13px">${esc(u.pw)}</span>
-    <button class="btn bd btn-xs" onclick="avShowPinModal('delUser',${u.id})">🗑</button>
+    <div style="display:flex;gap:4px">
+      <button class="btn bg btn-xs" onclick="startEditUser(${i})" title="Bearbeiten">✏️</button>
+      <button class="btn bd btn-xs" onclick="deleteUser(${i})" title="Löschen">🗑</button>
+    </div>
   </div>`).join('');
+}
+function _userFormMode(mode,idx){
+  const btn=document.getElementById('u-save-btn');
+  const lbl=document.getElementById('u-form-lbl');
+  const cancel=document.getElementById('u-cancel-btn');
+  if(mode==='edit'){
+    _editUserIdx=idx;
+    if(btn){btn.textContent='✅ Speichern';btn.onclick=saveUser;}
+    if(lbl)lbl.textContent='Benutzer bearbeiten';
+    if(cancel)cancel.style.display='inline-block';
+  } else {
+    _editUserIdx=null;
+    if(btn){btn.textContent='+ Hinzufügen';btn.onclick=addUser;}
+    if(lbl)lbl.textContent='Neuer Benutzer';
+    if(cancel)cancel.style.display='none';
+  }
+}
+function startEditUser(idx){
+  const u=S.users[idx];if(!u)return;
+  document.getElementById('u-name').value=u.name;
+  document.getElementById('u-pw').value=u.pw;
+  _userFormMode('edit',idx);
+  document.getElementById('u-name').focus();
+}
+function saveUser(){
+  const name=document.getElementById('u-name').value.trim();
+  const pw=document.getElementById('u-pw').value.trim();
+  if(!name||!pw){showToast('⚠️ Name und Kennwort eingeben');return;}
+  if(S.users.some((u,i)=>u.pw===pw&&i!==_editUserIdx)){showToast('⚠️ Dieses Kennwort ist bereits vergeben');return;}
+  S.users[_editUserIdx]={...S.users[_editUserIdx],name,pw};
+  document.getElementById('u-name').value='';document.getElementById('u-pw').value='';
+  _userFormMode('add');saveState();renderUsers();showToast('✅ Benutzer aktualisiert');
+}
+function deleteUser(idx){
+  const u=S.users[idx];if(!u)return;
+  if(!confirm(`"${u.name}" wirklich löschen? Der Zugang wird sofort gesperrt.`))return;
+  if(sessionStorage.getItem('bau_user_pw')===u.pw){
+    sessionStorage.removeItem('bau_logged');sessionStorage.removeItem('bau_user_pw');
+  }
+  S.users.splice(idx,1);
+  saveState();renderUsers();showToast('🗑️ Benutzer gelöscht');
 }
 function addUser(){
   const name=document.getElementById('u-name').value.trim();
@@ -2281,9 +2347,8 @@ function addUser(){
   if(!name||!pw){showToast('⚠️ Name und Kennwort eingeben');return;}
   if(S.users.find(u=>u.pw===pw)){showToast('⚠️ Dieses Kennwort ist bereits vergeben');return;}
   S.users.push({id:S.ids.user++,name,pw});
-  saveState();renderUsers();
   document.getElementById('u-name').value='';document.getElementById('u-pw').value='';
-  showToast('✅ Benutzer hinzugefügt');
+  saveState();renderUsers();showToast('✅ Benutzer hinzugefügt');
 }
 
 // ================================================================
