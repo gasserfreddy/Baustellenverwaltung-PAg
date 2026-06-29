@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -127,7 +127,7 @@ input:focus,select:focus,textarea:focus{border-color:#2d5a8e;box-shadow:0 0 0 3p
 .gr.sp{height:5px;background:transparent;min-height:0}
 .gr-lbl{flex-shrink:0;padding:4px 12px;font-size:12.5px;display:flex;align-items:center;gap:5px;border-right:1px solid #eef1f6;overflow:hidden}
 .gr-lbl .sub{font-size:10.5px;color:#94a3b8;margin-left:3px}
-.gr-bars{flex-shrink:0;position:relative;overflow:visible}
+.gr-bars{flex-shrink:0;position:relative;overflow:hidden}
 .g-bar{position:absolute;height:20px;top:6px;border-radius:5px;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.18);cursor:default;transition:opacity .15s;z-index:5}
 .g-bar:hover{opacity:.82;z-index:10}
 .gc-proj{background:#37474f}.gc-pl{background:#1565c0}.gc-polier{background:#6d28d9}
@@ -282,14 +282,6 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
-
-<!--[if gte mso 9]><xml>
-<mso:CustomDocumentProperties>
-<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocId>
-<mso:_dlc_DocIdItemGuid msdt:dt="string">ab50b1d9-e42a-4ba1-9882-f18bde6161a2</mso:_dlc_DocIdItemGuid>
-<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-926040, D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocIdUrl>
-</mso:CustomDocumentProperties>
-</xml><![endif]-->
 </head>
 <body>
 
@@ -463,6 +455,17 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
       </div>
       <div class="fg"><label class="lbl">Zeitraster</label>
         <select id="g-viewmode" onchange="renderGantt()"><option value="week">Wochen</option><option value="month">Monate</option></select>
+      </div>
+      <div class="fg"><label class="lbl">Ansichtsfenster</label>
+        <div style="display:flex;gap:0;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;width:fit-content">
+          <button id="btn-vollansicht" onclick="setGanttWindow('full')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#1a3a5c;color:#fff">Vollständig</button>
+          <button id="btn-teilansicht" onclick="setGanttWindow('part')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#f1f5f9;color:#64748b">Teilansicht</button>
+        </div>
+        <div id="teilansicht-options" style="display:none;margin-top:6px;display:none;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:12px;color:#64748b">Zukunft:</span>
+          <input type="number" id="g-future-months" value="6" min="1" max="36" style="width:52px;padding:3px 6px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px" oninput="renderGantt()" title="Monate in die Zukunft anzeigen">
+          <span style="font-size:12px;color:#64748b">Monate</span>
+        </div>
       </div>
       <div class="fg" style="margin-left:auto">
         <label class="lbl">PDF drucken</label>
@@ -1676,7 +1679,17 @@ function renderGantt(){
   function exp(ws,dur){const ms=w2ms(ws);if(!ms)return;minMs=Math.min(minMs,ms);maxMs=Math.max(maxMs,ms+(dur||1)*WK);}
   show.forEach(p=>{exp(p.start,p.dauer);[...(p.pl||[]),...(p.va||[]),...(p.bk||[])].forEach(a=>exp(a.start,a.dauer||1));});
   if(minMs===Infinity){out.innerHTML=`<div class="empty"><div class="eico">📅</div><p>Keine Termine vorhanden.</p></div>`;return;}
-  minMs-=WK;maxMs+=WK;
+  // ── Teilansicht: -3 Monate | Zukunft vollständig bis min. N Monate ─
+  const _ganttWindow=window._ganttWindow||'full';
+  if(_ganttWindow==='part'){
+    const stichVal=document.getElementById('g-stichtag')?.value;
+    const refMs=stichVal?new Date(stichVal+'T00:00:00').getTime():new Date().setHours(0,0,0,0);
+    const futureMonths=Math.max(1,parseInt(document.getElementById('g-future-months')?.value)||6);
+    minMs=refMs-13*WK; // ca. -3 Monate
+    maxMs=refMs+Math.round(futureMonths*4.33)*WK; // exakt N Monate in die Zukunft
+  } else {
+    minMs-=WK;maxMs+=WK;
+  }
   const totalWks=Math.ceil((maxMs-minMs)/WK);const timeW=totalWks*WPX;
   const wx=ws=>{const ms=w2ms(ws);return Math.round((ms-minMs)/WK)*WPX;};
   const barLeft=(ws,dur)=>`left:${wx(ws)}px;width:${dur*WPX}px;`;
@@ -2207,6 +2220,28 @@ function reactivateProj(id){
   const p=getPrj(id);if(!p)return;
   p.status='auftrag';saveState();renderArchiv();renderProj();renderAVDashboard();
   showToast('↺ Projekt reaktiviert als Auftrag');
+}
+
+// ================================================================
+// GANTT WINDOW TOGGLE
+// ================================================================
+function setGanttWindow(mode){
+  window._ganttWindow=mode;
+  const bFull=document.getElementById('btn-vollansicht');
+  const bPart=document.getElementById('btn-teilansicht');
+  const opts=document.getElementById('teilansicht-options');
+  if(bFull&&bPart){
+    if(mode==='full'){
+      bFull.style.background='#1a3a5c';bFull.style.color='#fff';
+      bPart.style.background='#f1f5f9';bPart.style.color='#64748b';
+      if(opts)opts.style.display='none';
+    }else{
+      bPart.style.background='#1a3a5c';bPart.style.color='#fff';
+      bFull.style.background='#f1f5f9';bFull.style.color='#64748b';
+      if(opts)opts.style.display='flex';
+    }
+  }
+  renderGantt();
 }
 
 // ================================================================
