@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -166,6 +166,21 @@ input:focus,select:focus,textarea:focus{border-color:#2d5a8e;box-shadow:0 0 0 3p
 .g-today-lbl{position:absolute;top:3px;left:4px;font-size:9px;background:#e8a020;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;white-space:nowrap;z-index:16}
 .g-datemark{position:absolute;top:0;bottom:0;width:2px;background:#dc2626;z-index:15;pointer-events:none}
 .g-datemark-lbl{position:absolute;top:3px;left:4px;font-size:9px;background:#dc2626;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700;white-space:nowrap;z-index:16}
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a3a5c 0%,#2d6a9f 100%);z-index:9999;display:flex;align-items:center;justify-content:center}
+#login-box{background:#fff;border-radius:16px;padding:40px 44px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#login-box .login-ico{font-size:48px;margin-bottom:8px}
+#login-box h2{margin:0 0 4px;color:#1a3a5c;font-size:22px}
+#login-box p{margin:0 0 24px;color:#64748b;font-size:13px}
+#login-pw{width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:15px;margin-bottom:12px;outline:none;transition:border .2s}
+#login-pw:focus{border-color:#2d6a9f}
+#login-btn{width:100%;padding:11px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+#login-btn:hover{background:#2d6a9f}
+#login-err{color:#dc2626;font-size:13px;margin-top:8px;min-height:18px}
+#login-loading{color:#64748b;font-size:14px;padding:10px 0}
+/* BENUTZERVERWALTUNG */
+.user-row{display:grid;grid-template-columns:1fr 1fr 36px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.user-row:last-child{border-bottom:none}
 .g-grid-week{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.055);pointer-events:none;z-index:1}
 .g-grid-month{position:absolute;top:0;bottom:0;width:1px;background:rgba(30,58,92,.22);pointer-events:none;z-index:2}
 .g-filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px;padding:10px 12px;background:#f8faff;border-radius:8px;border:1px solid #e8edf4}
@@ -267,8 +282,48 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .item-hint{display:none}
 }
 </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">ab50b1d9-e42a-4ba1-9882-f18bde6161a2</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-926040, D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
+
+<!-- Login Overlay -->
+<div id="login-overlay" style="display:none">
+  <div id="login-box">
+    <div class="login-ico">🏗️</div>
+    <h2>Baustellenverwaltung</h2>
+    <p>Bitte Kennwort eingeben</p>
+    <div id="login-loading">⏳ Daten werden geladen…</div>
+    <div id="login-form" style="display:none">
+      <input type="password" id="login-pw" placeholder="Kennwort" onkeydown="if(event.key==='Enter')doLogin()">
+      <button id="login-btn" onclick="doLogin()">Anmelden</button>
+      <div id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Benutzerverwaltung Modal -->
+<div class="overlay" id="modal-users" onclick="if(event.target===this)document.getElementById('modal-users').classList.remove('open')">
+<div class="modal" style="max-width:520px">
+  <div class="mhd"><div class="mtitle">👤 Benutzerverwaltung</div><button class="mclose" onclick="document.getElementById('modal-users').classList.remove('open')">✕</button></div>
+  <div style="padding:16px 20px">
+    <p style="margin:0 0 12px;font-size:13px;color:#64748b">Mitarbeiter mit Zugang zur App. Jeder Eintrag erhält ein individuelles Kennwort.</p>
+    <div id="users-list"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:14px;align-items:end">
+      <div><label class="lbl">Name</label><input class="inp" id="u-name" placeholder="Hans Muster"></div>
+      <div><label class="lbl">Kennwort</label><input class="inp" id="u-pw" placeholder="z.B. bau2025"></div>
+      <button class="btn bg" onclick="addUser()" style="align-self:end">+ Hinzufügen</button>
+    </div>
+    <p style="margin:14px 0 0;font-size:11px;color:#94a3b8">⚠️ Solange keine Benutzer angelegt sind, ist die App ohne Login zugänglich.</p>
+  </div>
+</div>
+</div>
 
 <div class="hdr">
   <div class="hdr-icon">🏗️</div>
@@ -282,6 +337,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
     <button class="btn bg btn-sm" onclick="exportJSON()" title="Daten als JSON-Backup herunterladen">⬇️ Backup</button>
     <button class="btn bg btn-sm" onclick="importJSON()" title="Daten aus JSON-Backup wiederherstellen">⬆️ Wiederherstellen</button>
     <button class="btn bg btn-sm" onclick="document.getElementById('modal-hilfe').classList.add('open')" title="Bedienungsanleitung">❓ Hilfe</button>
+    <button class="btn bg btn-sm" onclick="avShowPinModal('openUsers')" title="Benutzerverwaltung (Admin)">👤 Benutzer</button>
     <button class="btn bg btn-sm" onclick="toggleLang()" id="btn-lang">🇩🇪 DE</button>
     <button class="btn bd btn-sm" onclick="avShowPinModal('reset')" style="font-size:11px;opacity:.7">🗑 Reset</button>
   </div>
@@ -1051,7 +1107,7 @@ function toggleLang(){
 // ================================================================
 // STATE
 // ================================================================
-const S={pl:[],va:[],bk:[],proj:[],ids:{pl:1,va:1,bk:1,proj:1},editing:null,sdedit:{type:null,id:null}};
+const S={pl:[],va:[],bk:[],proj:[],users:[],ids:{pl:1,va:1,bk:1,proj:1,user:1},editing:null,sdedit:{type:null,id:null}};
 let rowCtr=0;
 const APP_KEY='bauapp_v2';
 
@@ -1087,10 +1143,11 @@ async function jbLoad(){
     }
     _jbStatus('ok');
   }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar ('+e.message+')');}
+  checkLoginRequired();
 }
 
 let _fsHandle=null;
-function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,ids:S.ids});}
+function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,ids:S.ids});}
 function saveState(){
   try{localStorage.setItem(APP_KEY,_statePayload());}catch(e){}
   _jbPush();
@@ -1100,8 +1157,8 @@ function clearAllData(){
   localStorage.removeItem(APP_KEY);location.reload();
 }
 function _applyData(d){
-  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];S.ids=d.ids||{pl:1,va:1,bk:1,proj:1};
-  localStorage.setItem(APP_KEY,JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,ids:S.ids}));
+  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];S.users=d.users||[];S.ids=d.ids||{pl:1,va:1,bk:1,proj:1,user:1};
+  localStorage.setItem(APP_KEY,JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,ids:S.ids}));
   renderAll();
 }
 function _fsConnected(name){
@@ -1919,7 +1976,7 @@ function confirmPinDelete(){
   const action=_pinAction;const payload=_pinPayload;
   closePinModal();
   if(action==='reset'){
-    const empty={pl:[],va:[],bk:[],proj:[],ids:{pl:1,va:1,bk:1,proj:1}};
+    const empty={pl:[],va:[],bk:[],proj:[],users:S.users,ids:{pl:1,va:1,bk:1,proj:1,user:S.ids.user||1}};
     fetch(FB_URL,{method:'PUT',body:JSON.stringify(empty)}).catch(()=>{});
     localStorage.removeItem(APP_KEY);location.reload();
   }
@@ -1933,6 +1990,8 @@ function confirmPinDelete(){
   else if(action==='delVA'){S.va=S.va.filter(x=>x.id!==payload);_sdReset('va');saveState();renderVA();showToast('🗑️ Person gelöscht');}
   else if(action==='delBK'){S.bk=S.bk.filter(x=>x.id!==payload);_sdReset('bk');saveState();renderBK();showToast('🗑️ Baukran gelöscht');}
   else if(action==='delArchiv'){S.proj=S.proj.filter(p=>p.id!==payload);saveState();renderArchiv();showToast('🗑️ Archiveintrag gelöscht');}
+  else if(action==='openUsers'){document.getElementById('modal-users').classList.add('open');renderUsers();}
+  else if(action==='delUser'){S.users=S.users.filter(u=>u.id!==payload);saveState();renderUsers();showToast('🗑️ Benutzer gelöscht');}
 }
 document.getElementById('pin-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmPinDelete();});
 
@@ -2151,9 +2210,60 @@ function reactivateProj(id){
 }
 
 // ================================================================
+// LOGIN & BENUTZERVERWALTUNG
+// ================================================================
+function checkLoginRequired(){
+  const ov=document.getElementById('login-overlay');
+  const frm=document.getElementById('login-form');
+  const ldg=document.getElementById('login-loading');
+  if(S.users.length===0){ov.style.display='none';return;}
+  if(sessionStorage.getItem('bau_logged')==='1'){ov.style.display='none';return;}
+  ov.style.display='flex';ldg.style.display='none';frm.style.display='block';
+  setTimeout(()=>document.getElementById('login-pw')?.focus(),100);
+}
+function doLogin(){
+  const pw=document.getElementById('login-pw').value.trim();
+  const err=document.getElementById('login-err');
+  const match=S.users.find(u=>u.pw===pw);
+  if(!match){err.textContent='❌ Falsches Kennwort';document.getElementById('login-pw').value='';document.getElementById('login-pw').focus();return;}
+  sessionStorage.setItem('bau_logged','1');
+  document.getElementById('login-overlay').style.display='none';
+  err.textContent='';
+  showToast('👋 Willkommen, '+match.name+'!');
+}
+function renderUsers(){
+  const list=document.getElementById('users-list');if(!list)return;
+  if(!S.users.length){list.innerHTML='<p style="color:#94a3b8;font-size:13px;margin:0">Noch keine Benutzer angelegt.</p>';return;}
+  list.innerHTML=S.users.map(u=>`<div class="user-row">
+    <span style="font-weight:600">${esc(u.name)}</span>
+    <span style="font-family:monospace;background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:13px">${esc(u.pw)}</span>
+    <button class="btn bd btn-xs" onclick="avShowPinModal('delUser',${u.id})">🗑</button>
+  </div>`).join('');
+}
+function addUser(){
+  const name=document.getElementById('u-name').value.trim();
+  const pw=document.getElementById('u-pw').value.trim();
+  if(!name||!pw){showToast('⚠️ Name und Kennwort eingeben');return;}
+  if(S.users.find(u=>u.pw===pw)){showToast('⚠️ Dieses Kennwort ist bereits vergeben');return;}
+  S.users.push({id:S.ids.user++,name,pw});
+  saveState();renderUsers();
+  document.getElementById('u-name').value='';document.getElementById('u-pw').value='';
+  showToast('✅ Benutzer hinzugefügt');
+}
+
+// ================================================================
 // INIT
 // ================================================================
 function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv();}
+// Login-Overlay sofort zeigen während Daten laden
+(function(){
+  const ov=document.getElementById('login-overlay');
+  // Aus localStorage laden um Benutzerliste sofort zu kennen
+  try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;}}catch(e){}
+  if(S.users.length>0&&!sessionStorage.getItem('bau_logged')){
+    ov.style.display='flex';
+  }
+})();
 renderAll();
 jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
 </script>
