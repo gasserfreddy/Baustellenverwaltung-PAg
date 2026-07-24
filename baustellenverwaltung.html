@@ -1162,7 +1162,16 @@ async function jbLoad(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     if(d&&typeof d==='object'&&d.proj!==undefined){
-      _applyData(d);showToast('☁️ Daten aktualisiert');
+      const hasData=(d.proj?.length||0)+(d.pl?.length||0)+(d.va?.length||0)+(d.bk?.length||0)>0;
+      if(hasData){
+        _applyData(d);showToast('☁️ Daten aktualisiert');
+      } else {
+        // Firebase ist leer → eingebettete Startdaten hochladen
+        _jbStatus('saving');
+        showToast('☁️ Daten werden in Cloud gespeichert…');
+        await fetch(FB_URL,{method:'PUT',body:JSON.stringify(_STARTDATEN)});
+        showToast('✅ Daten erfolgreich in Cloud gespeichert');
+      }
     }
     _jbStatus('ok');
   }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar ('+e.message+')');}
