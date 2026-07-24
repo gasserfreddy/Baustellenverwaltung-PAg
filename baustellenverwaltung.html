@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -340,7 +340,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
     <span class="fs-indicator" id="jb-status" style="display:none;cursor:default">☁️</span>
     <button class="btn bg btn-sm" onclick="jbLoad()" title="Aktuelle Daten von allen Mitarbeitern laden">🔄 Aktualisieren</button>
     <button class="btn bg btn-sm" onclick="exportJSON()" title="Daten als JSON-Backup herunterladen">⬇️ Backup</button>
-    <button class="btn bg btn-sm" onclick="importJSON()" title="Daten aus JSON-Backup wiederherstellen">⬆️ Wiederherstellen</button>
+    <label class="btn bg btn-sm" title="Daten aus JSON-Backup wiederherstellen" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
     <button class="btn bg btn-sm" onclick="document.getElementById('modal-hilfe').classList.add('open')" title="Bedienungsanleitung">❓ Hilfe</button>
     <button class="btn bg btn-sm" onclick="avShowPinModal('openUsers')" title="Benutzerverwaltung (Admin)">👤 Benutzer</button>
     <button class="btn bg btn-sm" onclick="toggleLang()" id="btn-lang">🇩🇪 DE</button>
@@ -1161,17 +1161,20 @@ async function jbLoad(){
     const r=await fetch(FB_URL);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    if(d&&typeof d==='object'&&d.proj!==undefined){
-      const hasData=(d.proj?.length||0)+(d.pl?.length||0)+(d.va?.length||0)+(d.bk?.length||0)>0;
-      if(hasData){
-        _applyData(d);showToast('☁️ Daten aktualisiert');
-      } else {
-        // Firebase ist leer → eingebettete Startdaten hochladen
-        _jbStatus('saving');
-        showToast('☁️ Daten werden in Cloud gespeichert…');
-        await fetch(FB_URL,{method:'PUT',body:JSON.stringify(_STARTDATEN)});
-        showToast('✅ Daten erfolgreich in Cloud gespeichert');
-      }
+    // Vergleich: Firebase-Daten vs. eingebettete Startdaten anhand Projekt-Zähler
+    const fbProjCount=(d&&d.proj?.length)||0;
+    const fbCounter=(d&&d.ids?.proj)||0;
+    const localCounter=_STARTDATEN.ids?.proj||0;
+    if(d&&typeof d==='object'&&d.proj!==undefined&&fbCounter>=localCounter&&fbProjCount>0){
+      // Firebase ist aktueller oder gleich → Firebase verwenden
+      _applyData(d);showToast('☁️ Daten aktualisiert');
+    } else {
+      // Firebase ist leer oder älter → eingebettete Daten in Firebase speichern
+      _jbStatus('saving');
+      showToast('☁️ Daten werden in Cloud gespeichert…');
+      await fetch(FB_URL,{method:'PUT',body:JSON.stringify(_STARTDATEN)});
+      _jbStatus('ok');
+      showToast('✅ Daten in Cloud gespeichert');
     }
     _jbStatus('ok');
   }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar ('+e.message+')');}
@@ -1256,6 +1259,20 @@ function exportJSON(){
   const b=new Blob([_statePayload()],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='baustellendaten.json';a.click();
   showToast('⬇️ Daten exportiert');
+}
+function importFromInput(inp){
+  const f=inp.files[0];if(!f)return;
+  inp.value=''; // Reset so gleiche Datei nochmals gewählt werden kann
+  const r=new FileReader();r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      _applyData(d);
+      _jbStatus('saving');
+      fetch(FB_URL,{method:'PUT',body:_statePayload()})
+        .then(res=>{if(!res.ok)throw new Error('HTTP '+res.status);_jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');})
+        .catch(err=>{_jbStatus('error');showToast('⚠️ Lokal geladen, Cloud-Fehler: '+err.message);});
+    }catch(e){showToast('⚠️ Ungültige Datei – kein gültiges JSON');}
+  };r.readAsText(f);
 }
 function importJSON(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
@@ -2414,12 +2431,14 @@ if(location.protocol==='file:'){
     <div class="fs-banner-btns"><a href="https://gasserfreddy.github.io/Baustellenverwaltung-PAg/baustellenverwaltung.html" target="_blank" style="background:#1a3a5c;color:#fff;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none">🔗 App öffnen</a></div>`;
   }
 }
-// Daten laden: 1) localStorage → 2) eingebettete Startdaten → 3) Firebase-Update
+// Daten laden: bevorzuge eingebettete Daten wenn localStorage leer/älter ist
 (function(){
   try{
     const raw=localStorage.getItem(APP_KEY);
     const d=raw?JSON.parse(raw):null;
-    _applyData(d&&d.proj!==undefined?d:_STARTDATEN);
+    // Nur localStorage nutzen wenn es mehr Projekte hat als die eingebetteten Daten
+    const localHasMore=d&&(d.ids?.proj||0)>=((_STARTDATEN.ids?.proj)||0)&&(d.proj?.length||0)>0;
+    _applyData(localHasMore?d:_STARTDATEN);
   }catch(e){_applyData(_STARTDATEN);}
 })();
 jbLoad(); // Firebase überschreibt mit aktuellsten Daten aus der Cloud
