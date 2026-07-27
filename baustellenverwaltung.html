@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1810,7 +1810,7 @@ function renderGantt(){
     else if(row.t==='bk'){const nm=bkName(row.a.id),tp=bkTyp(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=tp==='Obendreher'?'gc-bko':'gc-bku';lbl=`<span style="color:${col}">🏗️ ${nm} <span class="sub">(${tp})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${nm} (${tp})\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     else if(row.t==='bk-plan'){const nm=bkName(row.kranId),tp=bkTyp(row.kranId);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=(tp==='Obendreher'?'gc-bko':'gc-bku')+' gc-plan';lbl=`<span style="color:${col};opacity:.75">🏗️ ${nm} <span class="sub">(↪ geplant von ${esc(row.vonP?.name||'?')})</span></span>`;bs=barLeft(row.p.start,row.p.dauer);bt=`${nm} – Geplante Versetzung\nVon: ${row.vonP?.name||'?'}\nNach: ${row.p.name}`;}
     if(row.t!=='proj'&&(row.p?.status||'auftrag')==='potenzial')bc+=' gc-potenzial';
-    const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):bkName(row.a.id);
+    const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):row.t==='bk-plan'?bkName(row.kranId):bkName(row.a.id);
     return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}${stichtagLine()}</div></div>`;
   }
   out.innerHTML=`<div class="gantt-outer"><div class="gantt-inner" style="width:${LBL_W+timeW+2}px"><div class="gh-row"><div class="gh-lbl" style="width:${LBL_W}px">Bezeichnung</div><div class="gh-wks" style="width:${timeW}px">${wkHdr}</div></div>${rows.map(rowHtml).join('')}</div></div>`;
