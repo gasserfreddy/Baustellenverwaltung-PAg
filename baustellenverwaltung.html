@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -437,7 +437,8 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
             <th style="width:82px">Baustart</th>
             <th style="width:82px">Bauende</th>
             <th style="width:36px">Wo.</th>
-            <th>Team &amp; Kräne</th>
+            <th>Team</th>
+            <th>Kräne</th>
             <th style="width:50px">AV</th>
             <th style="width:88px"></th>
           </tr>
@@ -445,7 +446,8 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
             <th><select id="pf-status" onchange="_pf.status=this.value;renderProj()"><option value="">Alle</option><option value="auftrag">Auftrag</option><option value="potenzial">Potenzial</option></select></th>
             <th><input id="pf-search" type="search" placeholder="🔍 Name/Ort" oninput="_pf.search=this.value;renderProj()"></th>
             <th></th><th></th><th></th><th></th>
-            <th><input id="pf-team" type="search" placeholder="🔍 Team / Kran" oninput="_pf.team=this.value;renderProj()"></th>
+            <th><input id="pf-team" type="search" placeholder="🔍 Team" oninput="_pf.team=this.value;renderProj()"></th>
+            <th><input id="pf-kran" type="search" placeholder="🔍 Kran" oninput="_pf.kran=this.value;renderProj()"></th>
             <th><select id="pf-av" onchange="_pf.av=this.value;renderProj()"><option value="">–</option><option value="0">0%</option><option value="part">&lt;100</option><option value="100">✓</option></select></th>
             <th></th>
           </tr>
@@ -1419,7 +1421,7 @@ function delProj(id){avShowPinModal('delProj',id);}
 // ================================================================
 function avPct(p){const c=getStatusCounts(p);const eff=c.total-c.na;return eff>0?Math.round(c.done/eff*100):0;}
 function fmtDate(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});}
-let _pf={status:'',search:'',team:'',av:''};
+let _pf={status:'',search:'',team:'',kran:'',av:''};
 function renderProj(){
   const body=document.getElementById('proj-body');
   const empty=document.getElementById('proj-empty');
@@ -1431,8 +1433,9 @@ function renderProj(){
   if(_pf.team){const q=_pf.team.toLowerCase();active=active.filter(p=>{
     const pln=(p.pl||[]).map(a=>plName(a.id)).join(' ').toLowerCase();
     const van=(p.va||[]).map(a=>vaName(a.id)).join(' ').toLowerCase();
-    const bkn=(p.bk||[]).map(a=>bkName(a.id)).join(' ').toLowerCase();
-    return pln.includes(q)||van.includes(q)||bkn.includes(q);});}
+    return pln.includes(q)||van.includes(q);});}
+  if(_pf.kran){const q=_pf.kran.toLowerCase();active=active.filter(p=>
+    (p.bk||[]).map(a=>bkName(a.id)).join(' ').toLowerCase().includes(q));}
   if(_pf.av)active=active.filter(p=>{
     if((p.status||'auftrag')==='potenzial')return false;
     const pct=avPct(p);
@@ -1457,11 +1460,9 @@ function renderProj(){
     const avBtn=isPot
       ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" title="AV nur für Aufträge">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
-    const plB=(p.pl||[]).map(a=>`<span class="bdg b-pl" style="font-size:10px">👷 ${sn(plName(a.id))}</span>`).join('');
-    const vaB=(p.va||[]).map(a=>{const r=vaRole(a.id);return`<span class="bdg ${roleBadge(r)}" style="font-size:10px">${roleIcon(r)} ${sn(vaName(a.id))}</span>`;}).join('');
+    const teamB=[...(p.pl||[]).map(a=>`<span class="bdg b-pl" style="font-size:10px">👷 ${sn(plName(a.id))}</span>`),
+      ...(p.va||[]).map(a=>{const r=vaRole(a.id);return`<span class="bdg ${roleBadge(r)}" style="font-size:10px">${roleIcon(r)} ${sn(vaName(a.id))}</span>`;})].join('');
     const bkB=(p.bk||[]).map(a=>`<span class="bdg ${bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku'}" style="font-size:10px">🏗️ ${bkName(a.id)}</span>`).join('');
-    const hasBk=(p.bk||[]).length>0;
-    const teamCell=`<div class="team-cell">${plB}${vaB}${hasBk?`<div style="flex-basis:100%;height:3px"></div>${bkB}`:''}</div>`;
     const startKw=p.start?fmtW(p.start):'–';
     const startDt=p.start?dtFmt(w2dateStr(p.start)):'–';
     let endKw='–',endDt='–';
@@ -1474,7 +1475,8 @@ function renderProj(){
       <td style="padding:6px 8px"><div class="kw-line">${startKw}</div><div class="dt-line">${startDt}</div></td>
       <td style="padding:6px 8px"><div class="kw-line">${endKw}</div><div class="dt-line">${endDt}</div></td>
       <td style="text-align:center;padding:6px 4px;color:#475569">${p.dauer||'–'}</td>
-      <td style="padding:4px 8px;vertical-align:top">${teamCell}</td>
+      <td style="padding:4px 8px;vertical-align:top"><div class="team-cell">${teamB||'<span style="color:#94a3b8">–</span>'}</div></td>
+      <td style="padding:4px 8px;vertical-align:top"><div class="team-cell">${bkB||'<span style="color:#94a3b8;font-size:11px">–</span>'}</div></td>
       <td style="text-align:center;padding:6px 4px">${avCell}</td>
       <td style="padding:4px 6px"><div class="tact">
         <button class="btn bg btn-xs" onclick="openModal(${p.id})" title="Bearbeiten">✏️</button>
