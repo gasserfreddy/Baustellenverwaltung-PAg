@@ -47,7 +47,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-full{width:100%;justify-content:center;margin-top:4px}
 
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.kw-line{font-size:12px;font-weight:600;white-space:nowrap}.dt-line{font-size:10px;color:#64748b;white-space:nowrap}.stk{display:flex;flex-direction:column;gap:2px}.stk-plan{border-left:2px dashed #94a3b8;padding-left:4px;margin-top:1px}.plan-lbl{font-size:9px;color:#64748b;font-style:italic}.tact{display:flex;gap:2px;justify-content:flex-end;flex-wrap:nowrap}.av-pct{font-weight:700;font-size:13px}#proj-twrap table{width:100%;border-collapse:collapse}.gc-plan{border:2px dashed!important;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.45) 0,rgba(255,255,255,0.45) 5px,transparent 5px,transparent 11px)!important;opacity:.8!important}#modal-kranplan{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center}#modal-kranplan .kp-box{background:#fff;border-radius:12px;padding:24px;width:380px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.kw-line{font-size:12px;font-weight:600;white-space:nowrap}.dt-line{font-size:10px;color:#64748b;white-space:nowrap}.stk{display:flex;flex-direction:column;gap:3px}.btn-plan{font-size:10px;padding:2px 7px;background:#eff6ff;border:1.5px dashed #3b82f6;border-radius:4px;cursor:pointer;color:#2563eb;font-family:inherit;display:inline-block;margin-top:2px;white-space:nowrap}.btn-plan:hover{background:#dbeafe}.plan-chip{font-size:10px;padding:2px 7px;background:#f0fdf4;border:1.5px solid #16a34a;border-radius:4px;color:#15803d;display:inline-flex;align-items:center;gap:4px;margin-top:2px;white-space:nowrap}.plan-chip-del{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:11px;padding:0;line-height:1}.plan-chip-del:hover{color:#ef4444}.tact{display:flex;gap:2px;justify-content:flex-end;flex-wrap:nowrap}.av-pct{font-weight:700;font-size:13px}#proj-twrap table{width:100%;border-collapse:collapse}.gc-plan{border:2px dashed!important;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.45) 0,rgba(255,255,255,0.45) 5px,transparent 5px,transparent 11px)!important;opacity:.8!important}#modal-kranplan{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center}#modal-kranplan .kp-box{background:#fff;border-radius:12px;padding:24px;width:400px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2)}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:10.5px;font-weight:700;color:#7a8ea8;text-transform:uppercase;letter-spacing:.6px;padding:9px 12px;border-bottom:2px solid #e8edf4;background:#f8faff}
 td{padding:8px 12px;font-size:13.5px;border-bottom:1px solid #f0f4f9;vertical-align:middle}
@@ -415,7 +415,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
       <button class="btn bg btn-sm" onclick="exportJSON()">⬇️ Backup erstellen</button>
       <label class="btn bg btn-sm" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
     </div>
-    <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup speichert alle Daten als JSON-Datei. Wiederherstellen importiert Daten aus einem Backup.</p>
+    <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup speichert alle Daten als JSON-Datei.</p>
   </div></div>
 </div>
 
@@ -1459,23 +1459,25 @@ function renderProj(){
       ?'<span style="color:#94a3b8;font-size:11px">–</span>'
       :`<span class="av-pct" style="color:${pctColor}">${pct}%</span>`;
     const avBtn=isPot
-      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" title="AV nur für Aufträge">✅</button>'
+      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
-    // Team: gestapelt nach Hierarchie PL → Polier → Vorarbeiter → Gruppenführer
+    // Team gestapelt: PL → Polier → Vorarbeiter → Gruppenführer
     const plRows=(p.pl||[]).map(a=>`<div>${bdg('b-pl','👷',sn(plName(a.id)))}</div>`).join('');
     const polierRows=(p.va||[]).filter(a=>vaRole(a.id)==='Polier').map(a=>`<div>${bdg('b-polier','🟣',sn(vaName(a.id)))}</div>`).join('');
     const vaRows=(p.va||[]).filter(a=>vaRole(a.id)==='Vorarbeiter').map(a=>`<div>${bdg('b-va','🔨',sn(vaName(a.id)))}</div>`).join('');
     const gfRows=(p.va||[]).filter(a=>vaRole(a.id)==='Gruppenführer').map(a=>`<div>${bdg('b-gf','🟡',sn(vaName(a.id)))}</div>`).join('');
     const teamCell=`<div class="stk">${plRows}${polierRows}${vaRows}${gfRows}</div>`;
-    // Kräne: gestapelt, mit Versetzungsplanung
+    // Kräne gestapelt + Versetzungsplanung
+    function kranPlanRow(kranId,projId){
+      const plan=(S.kranPlan||[]).find(kp=>kp.kranId===kranId&&kp.vonProjId===projId);
+      if(plan){
+        const nm=esc(projName(plan.nachProjId));
+        return`<div class="plan-chip">↪ ${nm}<button class="plan-chip-del" onclick="openKranPlanModal(${kranId},${projId},${plan.id})" title="Bearbeiten">✏️</button><button class="plan-chip-del" onclick="delKranPlan(${plan.id})" title="Entfernen">✕</button></div>`;
+      }
+      return`<button class="btn-plan" onclick="openKranPlanModal(${kranId},${projId})">📅 Versetzung planen</button>`;
+    }
     const bkCell=(p.bk||[]).length
-      ?`<div class="stk">${(p.bk||[]).map(a=>{
-          const plan=(S.kranPlan||[]).find(kp=>kp.kranId===a.id&&kp.vonProjId===p.id);
-          const planRow=plan
-            ?`<div class="stk-plan"><span class="plan-lbl">↪ ${esc(projName(plan.nachProjId))}</span>&nbsp;<button onclick="openKranPlanModal(${a.id},${p.id},${plan.id})" title="Bearbeiten" style="font-size:9px;background:none;border:none;cursor:pointer;color:#64748b;padding:0">✏️</button><button onclick="delKranPlan(${plan.id})" title="Entfernen" style="font-size:9px;background:none;border:none;cursor:pointer;color:#94a3b8;padding:0">✕</button></div>`
-            :`<div><button onclick="openKranPlanModal(${a.id},${p.id})" style="font-size:9px;padding:1px 4px;background:#f1f5f9;border:1px dashed #94a3b8;border-radius:3px;cursor:pointer;color:#64748b;margin-top:1px">📅 planen</button></div>`;
-          return`<div>${bdg(bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku','🏗️',bkName(a.id))}</div>${planRow}`;
-        }).join('')}</div>`
+      ?`<div class="stk">${(p.bk||[]).map(a=>`<div>${bdg(bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku','🏗️',bkName(a.id))}</div>${kranPlanRow(a.id,p.id)}`).join('')}</div>`
       :'<span style="color:#94a3b8;font-size:11px">–</span>';
     const startKw=p.start?fmtW(p.start):'–';
     const startDt=p.start?dtFmt(w2dateStr(p.start)):'–';
@@ -1796,12 +1798,8 @@ function renderGantt(){
     if(F.pl)(p.pl||[]).forEach(a=>rows.push({t:'pl',p,a,ind:1}));
     (p.va||[]).forEach(a=>{if(vaVis(a.id))rows.push({t:'va',p,a,ind:1});});
     (p.bk||[]).forEach(a=>{if(bkVis(a.id))rows.push({t:'bk',p,a,ind:1});});
-    // Geplante Kranversetzungen (Eingang)
     (S.kranPlan||[]).filter(kp=>kp.nachProjId===p.id).forEach(kp=>{
-      if(bkVis(kp.kranId)){
-        const vonP=S.proj.find(pp=>pp.id===kp.vonProjId);
-        rows.push({t:'bk-plan',p,kranId:kp.kranId,vonP,ind:1});
-      }
+      if(bkVis(kp.kranId)){const vonP=S.proj.find(pp=>pp.id===kp.vonProjId);rows.push({t:'bk-plan',p,kranId:kp.kranId,vonP,ind:1});}
     });
     rows.push({t:'sep'});
   });
@@ -1812,7 +1810,7 @@ function renderGantt(){
     else if(row.t==='pl'){const nm=plName(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);lbl=`<span style="color:#1565c0">👷 ${nm}</span>`;bc='gc-pl';bs=barLeft(row.a.start,row.a.dauer||1);bt=`PL: ${nm}\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     else if(row.t==='va'){const nm=vaName(row.a.id),rl=vaRole(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=rl==='Polier'?'#6d28d9':rl==='Gruppenführer'?'#d97706':'#2e7d32';bc=rl==='Polier'?'gc-polier':rl==='Gruppenführer'?'gc-gf':'gc-va';lbl=`<span style="color:${col}">${roleIcon(rl)} ${nm} <span class="sub">(${rl})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${rl}: ${nm}\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
     else if(row.t==='bk'){const nm=bkName(row.a.id),tp=bkTyp(row.a.id);const endD=barEndDate(row.a.start,row.a.dauer||1);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=tp==='Obendreher'?'gc-bko':'gc-bku';lbl=`<span style="color:${col}">🏗️ ${nm} <span class="sub">(${tp})</span></span>`;bs=barLeft(row.a.start,row.a.dauer||1);bt=`${nm} (${tp})\nStart: ${fmtW(row.a.start)}\nEnde: ${endD}\nDauer: ${row.a.dauer||1} Wo.`;}
-    else if(row.t==='bk-plan'){const nm=bkName(row.kranId),tp=bkTyp(row.kranId);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=(tp==='Obendreher'?'gc-bko':'gc-bku')+' gc-plan';lbl=`<span style="color:${col};opacity:.75">🏗️ ${nm} <span class="sub">(geplant ↪ ${esc(row.vonP?.name||'?')})</span></span>`;bs=barLeft(row.p.start,row.p.dauer);bt=`${nm} – Geplante Versetzung\nVon: ${row.vonP?.name||'?'}\nNach: ${row.p.name}\nStart: ${fmtW(row.p.start)}\nDauer: ${row.p.dauer} Wo.`;}
+    else if(row.t==='bk-plan'){const nm=bkName(row.kranId),tp=bkTyp(row.kranId);const col=tp==='Obendreher'?'#e65100':'#880e4f';bc=(tp==='Obendreher'?'gc-bko':'gc-bku')+' gc-plan';lbl=`<span style="color:${col};opacity:.75">🏗️ ${nm} <span class="sub">(↪ geplant von ${esc(row.vonP?.name||'?')})</span></span>`;bs=barLeft(row.p.start,row.p.dauer);bt=`${nm} – Geplante Versetzung\nVon: ${row.vonP?.name||'?'}\nNach: ${row.p.name}`;}
     if(row.t!=='proj'&&(row.p?.status||'auftrag')==='potenzial')bc+=' gc-potenzial';
     const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):bkName(row.a.id);
     return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}${stichtagLine()}</div></div>`;
@@ -1858,13 +1856,13 @@ ${ganttEl.innerHTML}
   <div class="kp-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <strong style="font-size:15px;color:#1e3a5c">🏗️ Kranversetzung planen</strong>
-      <button onclick="closeKranPlanModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#64748b">✕</button>
+      <button onclick="closeKranPlanModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;line-height:1">✕</button>
     </div>
-    <p id="kp-kran-lbl" style="font-size:12px;color:#64748b;margin-bottom:12px"></p>
-    <label style="font-size:12px;font-weight:600;color:#374151">Nächste Baustelle:</label>
-    <select id="kp-proj-sel" onchange="_checkKPConflict()" style="width:100%;margin:6px 0 12px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;color:#1e293b"></select>
-    <div id="kp-conflict-warn" style="display:none;color:#b45309;font-size:11px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;margin-bottom:12px;line-height:1.5"></div>
-    <p style="font-size:11px;color:#94a3b8;margin-bottom:14px">Diese Planung ist informativ. Bei Doppelbelegung erscheint ein Hinweis, die Speicherung bleibt möglich.</p>
+    <p id="kp-kran-lbl" style="font-size:12px;color:#64748b;margin-bottom:14px;font-style:italic"></p>
+    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Nächste Baustelle:</label>
+    <select id="kp-proj-sel" onchange="_checkKPConflict()" style="width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;color:#1e293b"></select>
+    <div id="kp-conflict-warn" style="display:none;color:#b45309;font-size:11px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;margin-bottom:12px;line-height:1.6"></div>
+    <p style="font-size:11px;color:#94a3b8;margin-bottom:16px">Diese Planung ist informativ und hat keinen Einfluss auf effektive Einsätze.</p>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn bg" onclick="closeKranPlanModal()">Abbrechen</button>
       <button class="btn bp" onclick="saveKranPlan()">💾 Speichern</button>
@@ -2442,12 +2440,12 @@ function addUser(){
 // ================================================================
 // INIT
 // ================================================================
-function projName(id){const p=S.proj.find(x=>x.id==id);return p?p.name+' – '+(p.ort||''):'–';}
+function projName(id){const p=S.proj.find(x=>x.id==id);return p?p.name:'–';}
 let _kpState={kranId:null,vonProjId:null,editId:null};
 function openKranPlanModal(kranId,vonProjId,editId){
   _kpState={kranId,vonProjId,editId:editId??null};
   const sel=document.getElementById('kp-proj-sel');
-  document.getElementById('kp-kran-lbl').textContent='Kran: '+bkName(kranId)+' · Von: '+(S.proj.find(p=>p.id===vonProjId)||{name:'?'}).name;
+  document.getElementById('kp-kran-lbl').textContent='Kran: '+bkName(kranId)+' · Aktuell: '+(S.proj.find(p=>p.id===vonProjId)||{name:'?'}).name;
   sel.innerHTML=S.proj.filter(p=>p.id!==vonProjId&&(p.status||'auftrag')!=='abgeschlossen')
     .map(p=>`<option value="${p.id}">${esc(p.name)} – ${esc(p.ort||'')}</option>`).join('');
   if(editId!=null){const plan=S.kranPlan.find(kp=>kp.id===editId);if(plan)sel.value=plan.nachProjId;}
@@ -2458,15 +2456,14 @@ function closeKranPlanModal(){document.getElementById('modal-kranplan').style.di
 function _checkKPConflict(){
   const warn=document.getElementById('kp-conflict-warn');
   const nachProjId=+document.getElementById('kp-proj-sel').value;
-  const {kranId,vonProjId,editId}=_kpState;
+  const{kranId,vonProjId,editId}=_kpState;
   const nachP=S.proj.find(p=>p.id===nachProjId);
   const conflicts=[];
   if(nachP&&(nachP.bk||[]).some(a=>a.id===kranId))
     conflicts.push(`⚠️ ${bkName(kranId)} ist bereits effektiv in „${nachP.name}" eingeplant.`);
   const dup=(S.kranPlan||[]).filter(kp=>kp.kranId===kranId&&kp.nachProjId===nachProjId&&kp.id!==editId);
-  if(dup.length){const vonP2=S.proj.find(p=>p.id===dup[0].vonProjId);conflicts.push(`⚠️ Dieser Kran ist bereits von „${vonP2?.name||'?'}" nach „${nachP?.name||'?'}" geplant.`);}
-  warn.innerHTML=conflicts.join('<br>');
-  warn.style.display=conflicts.length?'':'none';
+  if(dup.length){const vonP2=S.proj.find(p=>p.id===dup[0].vonProjId);conflicts.push(`⚠️ Dieser Kran ist von „${vonP2?.name||'?'}" bereits nach „${nachP?.name||'?'}" geplant.`);}
+  warn.innerHTML=conflicts.join('<br>');warn.style.display=conflicts.length?'':'none';
 }
 function saveKranPlan(){
   const nachProjId=+document.getElementById('kp-proj-sel').value;
