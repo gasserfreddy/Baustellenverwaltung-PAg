@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1814,7 +1814,9 @@ function renderGantt(){
     const txt=row.t==='proj'?esc(row.p.name):row.t==='pl'?plName(row.a.id):row.t==='va'?vaName(row.a.id):row.t==='bk-plan'?bkName(row.kranId):bkName(row.a.id);
     return`<div class="gr"><div class="gr-lbl" style="width:${LBL_W}px;padding-left:${pad}px">${lbl}</div><div class="gr-bars" style="width:${timeW}px;height:32px">${gridHtml}<div class="g-bar ${bc}" style="${bs}" title="${esc(bt)}">${txt}</div>${todayLine()}${stichtagLine()}</div></div>`;
   }
+  const _prevScroll=out.querySelector('.gantt-outer')?.scrollLeft;
   out.innerHTML=`<div class="gantt-outer"><div class="gantt-inner" style="width:${LBL_W+timeW+2}px"><div class="gh-row"><div class="gh-lbl" style="width:${LBL_W}px">Bezeichnung</div><div class="gh-wks" style="width:${timeW}px">${wkHdr}</div></div>${rows.map(rowHtml).join('')}</div></div>`;
+  {const _oel=out.querySelector('.gantt-outer');if(_oel){if(_prevScroll===undefined&&showTodayCalc){_oel.scrollLeft=Math.max(0,todayX-Math.round((_oel.offsetWidth||600)*0.3));}else if(_prevScroll!==undefined){_oel.scrollLeft=_prevScroll;}}}
 }
 
 function printGanttPDF(format){
