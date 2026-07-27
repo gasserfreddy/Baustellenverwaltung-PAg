@@ -47,7 +47,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-full{width:100%;justify-content:center;margin-top:4px}
 
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.kw-line{font-size:12px;font-weight:600;white-space:nowrap}.dt-line{font-size:10px;color:#64748b;white-space:nowrap}.stk{display:flex;flex-direction:column;gap:3px}.btn-plan{font-size:10px;padding:2px 7px;background:#eff6ff;border:1.5px dashed #3b82f6;border-radius:4px;cursor:pointer;color:#2563eb;font-family:inherit;display:inline-block;margin-top:2px;white-space:nowrap}.btn-plan:hover{background:#dbeafe}.plan-chip{font-size:10px;padding:2px 7px;background:#f0fdf4;border:1.5px solid #16a34a;border-radius:4px;color:#15803d;display:inline-flex;align-items:center;gap:4px;margin-top:2px;white-space:nowrap}.plan-chip-del{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:11px;padding:0;line-height:1}.plan-chip-del:hover{color:#ef4444}.tact{display:flex;gap:2px;justify-content:flex-end;flex-wrap:nowrap}.av-pct{font-weight:700;font-size:13px}#proj-twrap table{width:100%;border-collapse:collapse}.gc-plan{border:2px dashed!important;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.45) 0,rgba(255,255,255,0.45) 5px,transparent 5px,transparent 11px)!important;opacity:.8!important}#modal-kranplan{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center}#modal-kranplan .kp-box{background:#fff;border-radius:12px;padding:24px;width:400px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.kw-line{font-size:12px;font-weight:600;white-space:nowrap}.dt-line{font-size:10px;color:#64748b;white-space:nowrap}.stk{display:flex;flex-direction:column;gap:3px}.btn-plan{font-size:10px;padding:2px 7px;background:#eff6ff;border:1.5px dashed #3b82f6;border-radius:4px;cursor:pointer;color:#2563eb;font-family:inherit;display:inline-block;margin-top:2px;white-space:nowrap}.btn-plan:hover{background:#dbeafe}.plan-chip{font-size:10px;padding:2px 7px;background:#f0fdf4;border:1.5px solid #16a34a;border-radius:4px;color:#15803d;display:inline-flex;align-items:center;gap:4px;margin-top:2px;white-space:nowrap}.plan-chip-del{background:none;border:none;cursor:pointer;color:#94a3b8;font-size:11px;padding:0;line-height:1}.plan-chip-del:hover{color:#ef4444}.tact{display:flex;gap:2px;justify-content:flex-end;flex-wrap:nowrap}.av-pct{font-weight:700;font-size:13px}#proj-twrap table{width:100%;border-collapse:collapse}.gc-plan{border:2px dashed!important;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.45) 0,rgba(255,255,255,0.45) 5px,transparent 5px,transparent 11px)!important;opacity:.8!important}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:10.5px;font-weight:700;color:#7a8ea8;text-transform:uppercase;letter-spacing:.6px;padding:9px 12px;border-bottom:2px solid #e8edf4;background:#f8faff}
 td{padding:8px 12px;font-size:13.5px;border-bottom:1px solid #f0f4f9;vertical-align:middle}
@@ -1448,6 +1448,14 @@ function renderProj(){
   function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
   function dtFmt(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
   function bdg(cls,icon,name){return`<span class="bdg ${cls}" style="font-size:10px">${icon} ${name}</span>`;}
+  function kranPlanRow(kranId,projId){
+    const plan=(S.kranPlan||[]).find(kp=>kp.kranId===kranId&&kp.vonProjId===projId);
+    if(plan){
+      const nm=esc(projName(plan.nachProjId));
+      return`<div class="plan-chip">↪ ${nm}<button class="plan-chip-del" onclick="openKranPlanModal(${kranId},${projId},${plan.id})" title="Bearbeiten">✏️</button><button class="plan-chip-del" onclick="delKranPlan(${plan.id})" title="Entfernen">✕</button></div>`;
+    }
+    return`<button class="btn-plan" onclick="openKranPlanModal(${kranId},${projId})">📅 Versetzung planen</button>`;
+  }
   body.innerHTML=active.map(p=>{
     const st=p.status||'auftrag';const isPot=st==='potenzial';
     const pct=avPct(p);
@@ -1461,21 +1469,11 @@ function renderProj(){
     const avBtn=isPot
       ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
-    // Team gestapelt: PL → Polier → Vorarbeiter → Gruppenführer
     const plRows=(p.pl||[]).map(a=>`<div>${bdg('b-pl','👷',sn(plName(a.id)))}</div>`).join('');
     const polierRows=(p.va||[]).filter(a=>vaRole(a.id)==='Polier').map(a=>`<div>${bdg('b-polier','🟣',sn(vaName(a.id)))}</div>`).join('');
     const vaRows=(p.va||[]).filter(a=>vaRole(a.id)==='Vorarbeiter').map(a=>`<div>${bdg('b-va','🔨',sn(vaName(a.id)))}</div>`).join('');
     const gfRows=(p.va||[]).filter(a=>vaRole(a.id)==='Gruppenführer').map(a=>`<div>${bdg('b-gf','🟡',sn(vaName(a.id)))}</div>`).join('');
     const teamCell=`<div class="stk">${plRows}${polierRows}${vaRows}${gfRows}</div>`;
-    // Kräne gestapelt + Versetzungsplanung
-    function kranPlanRow(kranId,projId){
-      const plan=(S.kranPlan||[]).find(kp=>kp.kranId===kranId&&kp.vonProjId===projId);
-      if(plan){
-        const nm=esc(projName(plan.nachProjId));
-        return`<div class="plan-chip">↪ ${nm}<button class="plan-chip-del" onclick="openKranPlanModal(${kranId},${projId},${plan.id})" title="Bearbeiten">✏️</button><button class="plan-chip-del" onclick="delKranPlan(${plan.id})" title="Entfernen">✕</button></div>`;
-      }
-      return`<button class="btn-plan" onclick="openKranPlanModal(${kranId},${projId})">📅 Versetzung planen</button>`;
-    }
     const bkCell=(p.bk||[]).length
       ?`<div class="stk">${(p.bk||[]).map(a=>`<div>${bdg(bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku','🏗️',bkName(a.id))}</div>${kranPlanRow(a.id,p.id)}`).join('')}</div>`
       :'<span style="color:#94a3b8;font-size:11px">–</span>';
@@ -1852,23 +1850,6 @@ body{background:#fff;font-family:Inter,system-ui,sans-serif;font-size:11px;margi
   <div class="print-meta">Gedruckt am ${now} · Format ${format}</div>
 </div>
 ${ganttEl.innerHTML}
-<div id="modal-kranplan">
-  <div class="kp-box">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <strong style="font-size:15px;color:#1e3a5c">🏗️ Kranversetzung planen</strong>
-      <button onclick="closeKranPlanModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;line-height:1">✕</button>
-    </div>
-    <p id="kp-kran-lbl" style="font-size:12px;color:#64748b;margin-bottom:14px;font-style:italic"></p>
-    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Nächste Baustelle:</label>
-    <select id="kp-proj-sel" onchange="_checkKPConflict()" style="width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;color:#1e293b"></select>
-    <div id="kp-conflict-warn" style="display:none;color:#b45309;font-size:11px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;margin-bottom:12px;line-height:1.6"></div>
-    <p style="font-size:11px;color:#94a3b8;margin-bottom:16px">Diese Planung ist informativ und hat keinen Einfluss auf effektive Einsätze.</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn bg" onclick="closeKranPlanModal()">Abbrechen</button>
-      <button class="btn bp" onclick="saveKranPlan()">💾 Speichern</button>
-    </div>
-  </div>
-</div>
 </body></html>`;
   const win=window.open('','_blank','width=1200,height=800');
   if(!win){alert('Bitte Pop-ups für diese Seite erlauben.');return;}
@@ -2443,39 +2424,39 @@ function addUser(){
 function projName(id){const p=S.proj.find(x=>x.id==id);return p?p.name:'–';}
 let _kpState={kranId:null,vonProjId:null,editId:null};
 function openKranPlanModal(kranId,vonProjId,editId){
-  _kpState={kranId,vonProjId,editId:editId??null};
+  _kpState={kranId,vonProjId,editId:(editId!==undefined&&editId!==null)?editId:null};
   const sel=document.getElementById('kp-proj-sel');
-  document.getElementById('kp-kran-lbl').textContent='Kran: '+bkName(kranId)+' · Aktuell: '+(S.proj.find(p=>p.id===vonProjId)||{name:'?'}).name;
-  sel.innerHTML=S.proj.filter(p=>p.id!==vonProjId&&(p.status||'auftrag')!=='abgeschlossen')
+  document.getElementById('kp-kran-lbl').textContent='Kran: '+bkName(kranId)+' · Aktuell: '+(S.proj.find(p=>p.id==vonProjId)||{name:'?'}).name;
+  sel.innerHTML=S.proj.filter(p=>p.id!=vonProjId&&(p.status||'auftrag')!=='abgeschlossen')
     .map(p=>`<option value="${p.id}">${esc(p.name)} – ${esc(p.ort||'')}</option>`).join('');
-  if(editId!=null){const plan=S.kranPlan.find(kp=>kp.id===editId);if(plan)sel.value=plan.nachProjId;}
+  if(_kpState.editId!==null){const plan=(S.kranPlan||[]).find(kp=>kp.id===_kpState.editId);if(plan)sel.value=plan.nachProjId;}
   _checkKPConflict();
-  document.getElementById('modal-kranplan').style.display='flex';
+  document.getElementById('modal-kranplan').classList.add('open');
 }
-function closeKranPlanModal(){document.getElementById('modal-kranplan').style.display='none';}
+function closeKranPlanModal(){document.getElementById('modal-kranplan').classList.remove('open');}
 function _checkKPConflict(){
   const warn=document.getElementById('kp-conflict-warn');
   const nachProjId=+document.getElementById('kp-proj-sel').value;
   const{kranId,vonProjId,editId}=_kpState;
-  const nachP=S.proj.find(p=>p.id===nachProjId);
+  const nachP=S.proj.find(p=>p.id==nachProjId);
   const conflicts=[];
-  if(nachP&&(nachP.bk||[]).some(a=>a.id===kranId))
-    conflicts.push(`⚠️ ${bkName(kranId)} ist bereits effektiv in „${nachP.name}" eingeplant.`);
-  const dup=(S.kranPlan||[]).filter(kp=>kp.kranId===kranId&&kp.nachProjId===nachProjId&&kp.id!==editId);
-  if(dup.length){const vonP2=S.proj.find(p=>p.id===dup[0].vonProjId);conflicts.push(`⚠️ Dieser Kran ist von „${vonP2?.name||'?'}" bereits nach „${nachP?.name||'?'}" geplant.`);}
+  if(nachP&&(nachP.bk||[]).some(a=>a.id==kranId))
+    conflicts.push('⚠️ '+bkName(kranId)+' ist bereits effektiv in „'+nachP.name+'“ eingeplant.');
+  const dup=(S.kranPlan||[]).filter(kp=>kp.kranId==kranId&&kp.nachProjId==nachProjId&&kp.id!==editId);
+  if(dup.length){const vonP2=S.proj.find(p=>p.id==dup[0].vonProjId);conflicts.push('⚠️ Dieser Kran ist von „'+(vonP2?.name||'?')+'“ bereits nach „'+(nachP?.name||'?')+'“ geplant.');}
   warn.innerHTML=conflicts.join('<br>');warn.style.display=conflicts.length?'':'none';
 }
 function saveKranPlan(){
   const nachProjId=+document.getElementById('kp-proj-sel').value;
   const{kranId,vonProjId,editId}=_kpState;
   if(!nachProjId)return;
-  if(editId!=null){const i=S.kranPlan.findIndex(kp=>kp.id===editId);if(i>=0)S.kranPlan[i]={id:editId,kranId,vonProjId,nachProjId};}
-  else{const newId=S.kranPlan.length?Math.max(...S.kranPlan.map(k=>k.id))+1:1;S.kranPlan.push({id:newId,kranId,vonProjId,nachProjId});}
+  if(editId!==null){const i=(S.kranPlan||[]).findIndex(kp=>kp.id===editId);if(i>=0)S.kranPlan[i]={id:editId,kranId,vonProjId,nachProjId};}
+  else{if(!S.kranPlan)S.kranPlan=[];const newId=S.kranPlan.length?Math.max(...S.kranPlan.map(k=>k.id))+1:1;S.kranPlan.push({id:newId,kranId,vonProjId,nachProjId});}
   saveState();closeKranPlanModal();renderProj();renderGantt();showToast('✅ Kranversetzung geplant');
 }
 function delKranPlan(id){
   if(!confirm('Planung entfernen?'))return;
-  S.kranPlan=S.kranPlan.filter(kp=>kp.id!==id);
+  S.kranPlan=(S.kranPlan||[]).filter(kp=>kp.id!==id);
   saveState();renderProj();renderGantt();showToast('✅ Planung entfernt');
 }
 function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv();}
@@ -2491,5 +2472,22 @@ function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv(
 renderAll();
 jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
 </script>
+<div class="overlay" id="modal-kranplan" onclick="if(event.target===this)closeKranPlanModal()">
+  <div style="background:#fff;border-radius:12px;padding:24px;width:400px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2);margin-top:60px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <strong style="font-size:15px;color:#1e3a5c">&#127959; Kranversetzung planen</strong>
+      <button onclick="closeKranPlanModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;line-height:1">&#x2715;</button>
+    </div>
+    <p id="kp-kran-lbl" style="font-size:12px;color:#64748b;margin-bottom:14px;font-style:italic"></p>
+    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">N&#228;chste Baustelle:</label>
+    <select id="kp-proj-sel" onchange="_checkKPConflict()" style="width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:7px;font-size:13px;color:#1e293b"></select>
+    <div id="kp-conflict-warn" style="display:none;color:#b45309;font-size:11px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;margin-bottom:12px;line-height:1.6"></div>
+    <p style="font-size:11px;color:#94a3b8;margin-bottom:16px">Diese Planung ist informativ und hat keinen Einfluss auf effektive Einpl&#228;ne.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn bg" onclick="closeKranPlanModal()">Abbrechen</button>
+      <button class="btn bp" onclick="saveKranPlan()">&#128190; Speichern</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
