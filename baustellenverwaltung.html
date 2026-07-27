@@ -47,7 +47,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-full{width:100%;justify-content:center;margin-top:4px}
 
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}
+.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:10.5px;font-weight:700;color:#7a8ea8;text-transform:uppercase;letter-spacing:.6px;padding:9px 12px;border-bottom:2px solid #e8edf4;background:#f8faff}
 td{padding:8px 12px;font-size:13.5px;border-bottom:1px solid #f0f4f9;vertical-align:middle}
@@ -413,10 +413,10 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
     <div class="card">
       <div class="card-title">💾 Datensicherung</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button class="btn bg btn-sm" onclick="exportJSON()" title="Alle Daten als JSON-Datei herunterladen">⬇️ Backup erstellen</button>
-        <label class="btn bg btn-sm" title="Daten aus JSON-Backup wiederherstellen" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
+        <button class="btn bg btn-sm" onclick="exportJSON()">⬇️ Backup erstellen</button>
+        <label class="btn bg btn-sm" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
       </div>
-      <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup: Alle Daten als JSON-Datei speichern. Wiederherstellen: Daten aus einem Backup importieren und in die Cloud übertragen.</p>
+      <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup speichert alle Daten als JSON-Datei. Wiederherstellen importiert Daten aus einem Backup.</p>
     </div>
   </div>
 </div>
@@ -430,13 +430,28 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div class="card" style="padding:0;overflow:hidden">
     <div id="proj-empty" class="empty"><div class="eico">🏢</div><p>Noch keine Projekte.<br>Klicken Sie auf <strong>+ Neues Projekt</strong>.</p></div>
     <div id="proj-twrap" class="twrap" style="display:none">
-      <table>
-        <thead><tr>
-          <th>Status</th><th>Projektname</th><th>Ort</th><th>Bauherr</th><th>Umsatz</th>
-          <th>Start</th><th>Ende</th><th>Dauer</th>
-          <th>Projektleiter</th><th>Vorarbeiter / Polier</th><th>Kräne</th>
-          <th>AV</th><th style="width:80px"></th>
-        </tr></thead>
+      <table style="table-layout:fixed;width:100%;min-width:820px">
+        <colgroup>
+          <col style="width:72px"><col><col style="width:82px">
+          <col style="width:76px"><col style="width:76px"><col style="width:40px">
+          <col style="width:165px"><col style="width:64px"><col style="width:36px"><col style="width:78px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Status</th><th>Projekt · Ort</th><th>Umsatz</th>
+            <th>Baustart</th><th>Bauende</th><th>Wo.</th>
+            <th>Team</th><th>Kräne</th><th>AV</th><th></th>
+          </tr>
+          <tr class="filter-row">
+            <th><select id="pf-status" onchange="_pf.status=this.value;renderProj()"><option value="">Alle</option><option value="auftrag">Auftrag</option><option value="potenzial">Potenzial</option></select></th>
+            <th><input id="pf-search" type="search" placeholder="🔍 Name / Ort …" oninput="_pf.search=this.value;renderProj()"></th>
+            <th></th><th></th><th></th><th></th>
+            <th><input id="pf-team" type="search" placeholder="🔍 Team …" oninput="_pf.team=this.value;renderProj()"></th>
+            <th></th>
+            <th><select id="pf-av" onchange="_pf.av=this.value;renderProj()"><option value="">–</option><option value="0">0%</option><option value="part">&lt;100%</option><option value="100">100%</option></select></th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody id="proj-body"></tbody>
       </table>
     </div>
@@ -1237,18 +1252,20 @@ function exportJSON(){
   showToast('⬇️ Daten exportiert');
 }
 function importFromInput(inp){
-  const f=inp.files[0];if(!f)return;
-  inp.value='';
-  const r=new FileReader();r.onload=ev=>{
+  var f=inp.files[0];if(!f)return;
+  inp.value="";
+  var r=new FileReader();
+  r.onload=function(ev){
     try{
-      const d=JSON.parse(ev.target.result);
+      var d=JSON.parse(ev.target.result);
       _applyData(d);
-      _jbStatus('saving');
-      fetch(FB_URL,{method:'PUT',body:_statePayload()})
-        .then(res=>{if(!res.ok)throw new Error('HTTP '+res.status);_jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');})
-        .catch(err=>{_jbStatus('error');showToast('⚠️ Lokal geladen, Cloud-Fehler: '+err.message);});
-    }catch(e){showToast('⚠️ Ungültige Datei – kein gültiges JSON');}
-  };r.readAsText(f);
+      _jbStatus("saving");
+      fetch(FB_URL,{method:"PUT",body:_statePayload()})
+        .then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);_jbStatus("ok");showToast("✅ Daten importiert und in Cloud gespeichert");})
+        .catch(function(err){_jbStatus("error");showToast("⚠️ Lokal geladen, Cloud-Fehler: "+err.message);});
+    }catch(e){showToast("⚠️ Ungültige Datei");}
+  };
+  r.readAsText(f);
 }
 function importJSON(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
@@ -1419,38 +1436,45 @@ function delProj(id){avShowPinModal('delProj',id);}
 // ================================================================
 function avPct(p){const c=getStatusCounts(p);const eff=c.total-c.na;return eff>0?Math.round(c.done/eff*100):0;}
 function fmtDate(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});}
+let _pf={status:'',search:'',team:'',av:''};
 function renderProj(){
   const body=document.getElementById('proj-body');
   const empty=document.getElementById('proj-empty');
   const twrap=document.getElementById('proj-twrap');
-  // Only show active projects (not archived)
-  const active=S.proj.filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+  let active=S.proj.filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+  if(_pf.status)active=active.filter(p=>(p.status||'auftrag')===_pf.status);
+  if(_pf.search){const q=_pf.search.toLowerCase();active=active.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.ort||'').toLowerCase().includes(q)||(p.client||'').toLowerCase().includes(q));}
+  if(_pf.team){const q=_pf.team.toLowerCase();active=active.filter(p=>{const pln=(p.pl||[]).map(a=>plName(a.id)).join(' ').toLowerCase();const van=(p.va||[]).map(a=>vaName(a.id)).join(' ').toLowerCase();return pln.includes(q)||van.includes(q);});}
+  if(_pf.av)active=active.filter(p=>{if((p.status||'auftrag')==='potenzial')return false;const pct=avPct(p);if(_pf.av==='0')return pct===0;if(_pf.av==='part')return pct>0&&pct<100;if(_pf.av==='100')return pct>=100;return true;});
   if(!active.length){empty.style.display='';twrap.style.display='none';return;}
   empty.style.display='none';twrap.style.display='';
   body.innerHTML=active.map(p=>{
     const st=p.status||'auftrag';
     const isPot=st==='potenzial';
-    const plB=(p.pl||[]).map(a=>`<span class="bdg b-pl" style="margin:1px">👷 ${plName(a.id)}</span>`).join(' ');
-    const vaB=(p.va||[]).map(a=>{const r=vaRole(a.id);return`<span class="bdg ${roleBadge(r)}" style="margin:1px">${roleIcon(r)} ${vaName(a.id)}</span>`;}).join(' ');
-    const bkB=(p.bk||[]).map(a=>`<span class="bdg ${bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku'}" style="margin:1px">🏗️ ${bkName(a.id)}</span>`).join(' ');
     const pct=avPct(p);const pctColor=pct>=100?'#16a34a':pct>0?'#d97706':'#94a3b8';
-    const statusBadge=isPot?`<span class="bdg b-potenzial">🔍 Potenzial</span>`:`<span class="bdg b-auftrag">📋 Auftrag</span>`;
-    const avCell=isPot?`<span style="color:#94a3b8;font-size:11px">–</span>`:`<span style="font-weight:700;color:${pctColor}">${pct}%</span>`;
+    const statusBadge=isPot?'<span class="bdg b-potenzial" style="font-size:10px">🔍 Pot.</span>':'<span class="bdg b-auftrag" style="font-size:10px">📋 Auft.</span>';
+    const avCell=isPot?'<span style="color:#94a3b8;font-size:11px">–</span>':`<span style="font-weight:700;color:${pctColor};font-size:12px">${pct}%</span>`;
     const avBtn=isPot
-      ?`<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" onclick="showToast('⚠️ AV nur für Aufträge verfügbar')">✅</button>`
+      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" onclick="showToast(\'⚠️ AV nur für Aufträge\')">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
-    return`<tr class="${isPot?'tr-potenzial':''}">
-      <td>${statusBadge}</td>
-      <td><strong>${esc(p.name)}</strong></td><td>📍 ${esc(p.ort)}</td>
-      <td>${esc(p.client||'')}</td>
+    function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
+    const teamB=[...(p.pl||[]).map(a=>`<span class="bdg b-pl" style="margin:1px;font-size:10px">👷 ${sn(plName(a.id))}</span>`),
+      ...(p.va||[]).map(a=>{const r=vaRole(a.id);return`<span class="bdg ${roleBadge(r)}" style="margin:1px;font-size:10px">${roleIcon(r)} ${sn(vaName(a.id))}</span>`;})].join('');
+    const bkB=(p.bk||[]).map(a=>`<span class="bdg ${bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku'}" style="margin:1px;font-size:10px">🏗️ ${bkName(a.id)}</span>`).join('');
+    const startStr=p.start?fmtW(p.start):'–';
+    let endStr='–';
+    if(p.end){const d=new Date(p.end+'T00:00:00');endStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+    else if(p.start&&p.dauer){const s=w2dateStr(p.start);if(s){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+p.dauer*7);endStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}}
+    return`<tr class="${isPot?'tr-potenzial':''}" style="font-size:12px">
+      <td style="text-align:center">${statusBadge}</td>
+      <td><div class="proj-name">${esc(p.name)}</div><div class="proj-ort">📍 ${esc(p.ort||'')}</div></td>
       <td style="white-space:nowrap">${fmtEur(p.umsatz)}</td>
-      <td style="white-space:nowrap">${fmtW(p.start)}</td>
-      <td style="white-space:nowrap;color:#475569">${fmtDate(p.end)}</td>
-      <td>${p.dauer||'–'} Wo.</td>
-      <td>${plB||'<span style="color:#94a3b8">–</span>'}</td>
-      <td>${vaB||'<span style="color:#94a3b8">–</span>'}</td>
-      <td>${bkB||'<span style="color:#94a3b8">–</span>'}</td>
-      <td>${avCell}</td>
+      <td style="white-space:nowrap">${startStr}</td>
+      <td style="white-space:nowrap;color:#475569">${endStr}</td>
+      <td style="text-align:center">${p.dauer||'–'}</td>
+      <td style="word-break:break-word">${teamB||'<span style="color:#94a3b8">–</span>'}</td>
+      <td style="word-break:break-word">${bkB||'<span style="color:#94a3b8">–</span>'}</td>
+      <td style="text-align:center">${avCell}</td>
       <td><div class="tact">
         <button class="btn bg btn-xs" onclick="openModal(${p.id})">✏️</button>
         ${avBtn}
