@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -47,13 +47,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-full{width:100%;justify-content:center;margin-top:4px}
 
 /* TABLE */
-.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kw-date{font-size:11px;font-weight:600;white-space:nowrap}.kw-sub{font-size:10px;color:#64748b;white-space:nowrap}
+.twrap{overflow-x:auto;border-radius:8px;border:1px solid #e8edf4}.filter-row th{padding:3px 4px!important;background:#f0f4f8;border-bottom:2px solid #e2e8f0}.filter-row input,.filter-row select{width:100%;padding:2px 5px;font-size:11px;border:1px solid #cbd5e1;border-radius:3px;box-sizing:border-box;background:#fff}.proj-name{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.proj-ort{font-size:11px;color:#64748b;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kw-line{font-size:12px;font-weight:600;white-space:nowrap}.dt-line{font-size:10px;color:#64748b;white-space:nowrap}.tact{display:flex;gap:3px;justify-content:flex-end;flex-wrap:nowrap}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:10.5px;font-weight:700;color:#7a8ea8;text-transform:uppercase;letter-spacing:.6px;padding:9px 12px;border-bottom:2px solid #e8edf4;background:#f8faff}
 td{padding:8px 12px;font-size:13.5px;border-bottom:1px solid #f0f4f9;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafcff}
-.tact{display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap}
+.tact{display:flex;gap:4px;justify-content:flex-end}
 
 /* BADGES */
 .bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
@@ -409,16 +409,14 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
       </div>
     </div>
   </div>
-  <div style="margin-top:16px">
-    <div class="card">
-      <div class="card-title">💾 Datensicherung</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button class="btn bg btn-sm" onclick="exportJSON()">⬇️ Backup erstellen</button>
-        <label class="btn bg btn-sm" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
-      </div>
-      <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup speichert alle Daten als JSON-Datei. Wiederherstellen importiert Daten aus einem Backup.</p>
+  <div style="margin-top:16px"><div class="card">
+    <div class="card-title">💾 Datensicherung</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn bg btn-sm" onclick="exportJSON()">⬇️ Backup erstellen</button>
+      <label class="btn bg btn-sm" style="cursor:pointer">⬆️ Wiederherstellen<input type="file" accept=".json" style="display:none" onchange="importFromInput(this)"></label>
     </div>
-  </div>
+    <p style="color:#94a3b8;font-size:12px;margin-top:10px;margin-bottom:0">Backup speichert alle Daten als JSON-Datei. Wiederherstellen importiert Daten aus einem Backup.</p>
+  </div></div>
 </div>
 
 <!-- ===== PROJEKTE ===== -->
@@ -430,11 +428,11 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div class="card" style="padding:0;overflow:hidden">
     <div id="proj-empty" class="empty"><div class="eico">🏢</div><p>Noch keine Projekte.<br>Klicken Sie auf <strong>+ Neues Projekt</strong>.</p></div>
     <div id="proj-twrap" class="twrap" style="display:none">
-      <table style="table-layout:fixed;width:100%;min-width:820px">
+      <table style="table-layout:fixed;width:100%">
         <colgroup>
-          <col style="width:68px"><col style="width:145px"><col style="width:80px">
-          <col style="width:84px"><col style="width:84px"><col style="width:36px">
-          <col style="width:155px"><col style="width:82px"><col style="width:36px"><col style="width:82px">
+          <col style="width:60px"><col style="width:115px"><col style="width:78px">
+          <col style="width:80px"><col style="width:80px"><col style="width:34px">
+          <col style="width:155px"><col style="width:94px"><col style="width:34px"><col style="width:80px">
         </colgroup>
         <thead>
           <tr>
@@ -444,9 +442,9 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
           </tr>
           <tr class="filter-row">
             <th><select id="pf-status" onchange="_pf.status=this.value;renderProj()"><option value="">Alle</option><option value="auftrag">Auftrag</option><option value="potenzial">Potenzial</option></select></th>
-            <th><input id="pf-search" type="search" placeholder="🔍 Name / Ort …" oninput="_pf.search=this.value;renderProj()"></th>
+            <th><input id="pf-search" type="search" placeholder="🔍 Name/Ort" oninput="_pf.search=this.value;renderProj()"></th>
             <th></th><th></th><th></th><th></th>
-            <th><input id="pf-team" type="search" placeholder="🔍 Team …" oninput="_pf.team=this.value;renderProj()"></th>
+            <th><input id="pf-team" type="search" placeholder="🔍 Team" oninput="_pf.team=this.value;renderProj()"></th>
             <th></th>
             <th><select id="pf-av" onchange="_pf.av=this.value;renderProj()"><option value="">–</option><option value="0">0%</option><option value="part">&lt;100%</option><option value="100">100%</option></select></th>
             <th></th>
@@ -1251,22 +1249,7 @@ function exportJSON(){
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='baustellendaten.json';a.click();
   showToast('⬇️ Daten exportiert');
 }
-function importFromInput(inp){
-  var f=inp.files[0];if(!f)return;
-  inp.value='';
-  var r=new FileReader();
-  r.onload=function(ev){
-    try{
-      var d=JSON.parse(ev.target.result);
-      _applyData(d);
-      _jbStatus('saving');
-      fetch(FB_URL,{method:'PUT',body:_statePayload()})
-        .then(function(res){if(!res.ok)throw new Error('HTTP '+res.status);_jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');})
-        .catch(function(err){_jbStatus('error');showToast('⚠️ Cloud-Fehler: '+err.message);});
-    }catch(e){showToast('⚠️ Ungültige Datei');}
-  };
-  r.readAsText(f);
-}
+function importFromInput(inp){var f=inp.files[0];if(!f)return;inp.value="";var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);_applyData(d);_jbStatus("saving");fetch(FB_URL,{method:"PUT",body:_statePayload()}).then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);_jbStatus("ok");showToast("✅ Importiert und gespeichert");}).catch(function(err){_jbStatus("error");showToast("⚠️ "+err.message);});}catch(e){showToast("⚠️ Ungültige Datei");}};r.readAsText(f);}
 function importJSON(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
   inp.onchange=e=>{
@@ -1449,14 +1432,9 @@ function renderProj(){
   if(!active.length){empty.style.display='';twrap.style.display='none';return;}
   empty.style.display='none';twrap.style.display='';
   function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
-  function kwDate(wkStr,isoEnd,dauer,startWk){
-    // Returns {kw, date} strings
-    let kwStr='–', dateStr='–';
-    if(wkStr){kwStr=fmtW(wkStr);}
-    if(isoEnd){const d=new Date(isoEnd+'T00:00:00');dateStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
-    else if(startWk&&dauer){const s=w2dateStr(startWk);if(s){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+dauer*7);dateStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});if(!isoEnd){const endW=d2w(d);kwStr=fmtW(endW);}}}
-    return{kw:kwStr,date:dateStr};
-  }
+  function kwFmt(wkStr){return wkStr?fmtW(wkStr):'–';}
+  function dtFmt(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+  function endFromStart(startWk,dauer){if(!startWk||!dauer)return{kw:'–',dt:'–'};const s=w2dateStr(startWk);if(!s)return{kw:'–',dt:'–'};const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+dauer*7);return{kw:fmtW(d2w(d)),dt:d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'})};}
   body.innerHTML=active.map(p=>{
     const st=p.status||'auftrag';
     const isPot=st==='potenzial';
@@ -1464,26 +1442,23 @@ function renderProj(){
     const statusBadge=isPot?'<span class="bdg b-potenzial" style="font-size:10px">🔍 Pot.</span>':'<span class="bdg b-auftrag" style="font-size:10px">📋 Auft.</span>';
     const avCell=isPot?'<span style="color:#94a3b8;font-size:11px">–</span>':`<span style="font-weight:700;color:${pctColor};font-size:12px">${pct}%</span>`;
     const avBtn=isPot
-      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" onclick="showToast(\'⚠️ AV nur für Aufträge\')">✅</button>'
+      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed" title="AV nur für Aufträge">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
     const teamB=[...(p.pl||[]).map(a=>`<span class="bdg b-pl" style="margin:1px;font-size:10px">👷 ${sn(plName(a.id))}</span>`),
       ...(p.va||[]).map(a=>{const r=vaRole(a.id);return`<span class="bdg ${roleBadge(r)}" style="margin:1px;font-size:10px">${roleIcon(r)} ${sn(vaName(a.id))}</span>`;})].join('');
     const bkB=(p.bk||[]).map(a=>`<span class="bdg ${bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku'}" style="margin:1px;font-size:10px">🏗️ ${bkName(a.id)}</span>`).join('');
-    const start=kwDate(p.start,null,null,null);
-    const end=kwDate(p.end?null:p.start,p.end,p.dauer,p.start);
-    const startKw=p.start?fmtW(p.start):'–';
-    let endKw='–',endDate='–';
-    if(p.end){const d=new Date(p.end+'T00:00:00');endDate=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});endKw=d2w?fmtW(d2w(d)):'–';}
-    else if(p.start&&p.dauer){const s=w2dateStr(p.start);if(s){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+p.dauer*7);endDate=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});endKw=fmtW(d2w(d));}}
-    const startDate=p.start?w2dateStr(p.start):'';
-    const startDateStr=startDate?new Date(startDate+'T00:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'}):'–';
+    const startKw=kwFmt(p.start);
+    const startDt=p.start?dtFmt(w2dateStr(p.start)):'–';
+    let endKw='–',endDt='–';
+    if(p.end){endDt=dtFmt(p.end);const d=new Date(p.end+'T00:00:00');endKw=fmtW(d2w(d));}
+    else{const e=endFromStart(p.start,p.dauer);endKw=e.kw;endDt=e.dt;}
     return`<tr class="${isPot?'tr-potenzial':''}" style="font-size:12px">
       <td style="text-align:center">${statusBadge}</td>
-      <td><div class="proj-name">${esc(p.name)}</div><div class="proj-ort">📍 ${esc(p.ort||'')}</div></td>
+      <td><div class="proj-name" title="${esc(p.name)}">${esc(p.name)}</div><div class="proj-ort" title="${esc(p.ort||'')}">📍 ${esc(p.ort||'')}</div></td>
       <td style="white-space:nowrap">${fmtEur(p.umsatz)}</td>
-      <td><div class="kw-date">${startKw}</div><div class="kw-sub">${startDateStr}</div></td>
-      <td><div class="kw-date">${endKw}</div><div class="kw-sub">${endDate}</div></td>
-      <td style="text-align:center">${p.dauer||'–'}</td>
+      <td><div class="kw-line">${startKw}</div><div class="dt-line">${startDt}</div></td>
+      <td><div class="kw-line">${endKw}</div><div class="dt-line">${endDt}</div></td>
+      <td style="text-align:center;color:#475569">${p.dauer||'–'}</td>
       <td style="word-break:break-word">${teamB||'<span style="color:#94a3b8">–</span>'}</td>
       <td style="word-break:break-word">${bkB||'<span style="color:#94a3b8">–</span>'}</td>
       <td style="text-align:center">${avCell}</td>
