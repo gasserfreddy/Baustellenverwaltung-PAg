@@ -1361,7 +1361,18 @@ function switchMainTab(tab){
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['proj','gantt','avcheck','archiv','stamm'][i]===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`panel-${tab}`).classList.add('active');
-  if(tab==='gantt')renderGantt();
+  if(tab==='gantt'){
+    if(window._ganttWindow===undefined){
+      window._ganttWindow='part';
+      const _bF=document.getElementById('btn-vollansicht'),_bP=document.getElementById('btn-teilansicht'),_op=document.getElementById('teilansicht-options'),_vm=document.getElementById('g-viewmode');
+      if(_bF){_bF.style.background='#f1f5f9';_bF.style.color='#64748b';}
+      if(_bP){_bP.style.background='#1a3a5c';_bP.style.color='#fff';}
+      if(_op)_op.style.display='flex';
+      if(_vm)_vm.value='month';
+      const _fm=document.getElementById('g-future-months');if(_fm&&_fm.value==='6')_fm.value='12';
+    }
+    renderGantt();
+  }
   if(tab==='avcheck')renderAVDashboard();
   if(tab==='archiv')renderArchiv();
 }
