@@ -437,7 +437,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
             <th style="width:82px">Baustart</th>
             <th style="width:82px">Bauende</th>
             <th style="width:36px">Wo.</th>
-            <th>Team</th>
+            <th style="min-width:150px">Team</th>
             <th>Kräne</th>
             <th style="width:50px">AV</th>
             <th style="width:92px"></th>
@@ -1484,10 +1484,10 @@ function renderProj(){
     const avBtn=isPot
       ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed">✅</button>'
       :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
-    const plRows=(p.pl||[]).map(a=>`<div>${bdg('b-pl','👷',sn(plName(a.id)))}</div>`).join('');
-    const polierRows=(p.va||[]).filter(a=>vaRole(a.id)==='Polier').map(a=>`<div>${bdg('b-polier','🟣',sn(vaName(a.id)))}</div>`).join('');
-    const vaRows=(p.va||[]).filter(a=>vaRole(a.id)==='Vorarbeiter').map(a=>`<div>${bdg('b-va','🔨',sn(vaName(a.id)))}</div>`).join('');
-    const gfRows=(p.va||[]).filter(a=>vaRole(a.id)==='Gruppenführer').map(a=>`<div>${bdg('b-gf','🟡',sn(vaName(a.id)))}</div>`).join('');
+    const plRows=(p.pl||[]).map(a=>`<div>${bdg('b-pl','👷',plName(a.id))}</div>`).join('');
+    const polierRows=(p.va||[]).filter(a=>vaRole(a.id)==='Polier').map(a=>`<div>${bdg('b-polier','🟣',vaName(a.id))}</div>`).join('');
+    const vaRows=(p.va||[]).filter(a=>vaRole(a.id)==='Vorarbeiter').map(a=>`<div>${bdg('b-va','🔨',vaName(a.id))}</div>`).join('');
+    const gfRows=(p.va||[]).filter(a=>vaRole(a.id)==='Gruppenführer').map(a=>`<div>${bdg('b-gf','🟡',vaName(a.id))}</div>`).join('');
     const teamCell=`<div class="stk">${plRows}${polierRows}${vaRows}${gfRows}</div>`;
     const bkCell=(p.bk||[]).length
       ?`<div class="stk">${(p.bk||[]).map(a=>`<div>${bdg(bkTyp(a.id)==='Obendreher'?'b-bko':'b-bku','🏗️',bkName(a.id))}</div>${kranPlanRow(a.id,p.id)}`).join('')}</div>`
