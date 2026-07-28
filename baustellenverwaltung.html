@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1427,7 +1427,10 @@ function renderProj(){
   const body=document.getElementById('proj-body');
   const empty=document.getElementById('proj-empty');
   const twrap=document.getElementById('proj-twrap');
-  let active=S.proj.filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+  const allNonDone=S.proj.filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+  if(!allNonDone.length){empty.style.display='';twrap.style.display='none';return;}
+  empty.style.display='none';twrap.style.display='';
+  let active=allNonDone;
   if(_pf.status)active=active.filter(p=>(p.status||'auftrag')===_pf.status);
   if(_pf.search){const q=_pf.search.toLowerCase();active=active.filter(p=>
     (p.name||'').toLowerCase().includes(q)||(p.ort||'').toLowerCase().includes(q)||(p.client||'').toLowerCase().includes(q));}
@@ -1444,7 +1447,7 @@ function renderProj(){
     if(_pf.av==='part')return pct>0&&pct<100;
     if(_pf.av==='100')return pct>=100;
     return true;});
-  if(!active.length){empty.style.display='';twrap.style.display='none';return;}
+  if(!active.length){body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">🔍 Kein Projekt entspricht dem Filter. <button onclick="_pf={status:'',search:'',team:'',kran:'',av:''};document.querySelectorAll('.filter-row input,.filter-row select').forEach(el=>{el.value='';});renderProj();" style="margin-left:10px;padding:3px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#f8faff;cursor:pointer;font-size:12px">Filter zurücksetzen</button></td></tr>`;return;}
   empty.style.display='none';twrap.style.display='';
   function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
   function dtFmt(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
