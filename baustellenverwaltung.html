@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -490,16 +490,16 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
         </div>
       </div>
       <div class="fg"><label class="lbl">Zeitraster</label>
-        <select id="g-viewmode" onchange="renderGantt()"><option value="week">Wochen</option><option value="month">Monate</option></select>
+        <select id="g-viewmode" onchange="renderGantt()"><option value="week">Wochen</option><option value="month" selected>Monate</option></select>
       </div>
       <div class="fg"><label class="lbl">Ansichtsfenster</label>
         <div style="display:flex;gap:0;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;width:fit-content">
-          <button id="btn-vollansicht" onclick="setGanttWindow('full')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#1a3a5c;color:#fff">Vollständig</button>
-          <button id="btn-teilansicht" onclick="setGanttWindow('part')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#f1f5f9;color:#64748b">Teilansicht</button>
+          <button id="btn-vollansicht" onclick="setGanttWindow('full')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#f1f5f9;color:#64748b">Vollständig</button>
+          <button id="btn-teilansicht" onclick="setGanttWindow('part')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#1a3a5c;color:#fff">Teilansicht</button>
         </div>
-        <div id="teilansicht-options" style="display:none;margin-top:6px;display:none;align-items:center;gap:6px;flex-wrap:wrap">
+        <div id="teilansicht-options" style="display:flex;margin-top:6px;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:12px;color:#64748b">Zukunft:</span>
-          <input type="number" id="g-future-months" value="6" min="1" max="36" style="width:52px;padding:3px 6px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px" oninput="renderGantt()" title="Monate in die Zukunft anzeigen">
+          <input type="number" id="g-future-months" value="12" min="1" max="36" style="width:52px;padding:3px 6px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px" oninput="renderGantt()" title="Monate in die Zukunft anzeigen">
           <span style="font-size:12px;color:#64748b">Monate</span>
         </div>
       </div>
@@ -1447,7 +1447,7 @@ function renderProj(){
     if(_pf.av==='part')return pct>0&&pct<100;
     if(_pf.av==='100')return pct>=100;
     return true;});
-  if(!active.length){body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">🔍 Kein Projekt entspricht dem Filter. <button onclick="_pf={status:'',search:'',team:'',kran:'',av:''};document.querySelectorAll('.filter-row input,.filter-row select').forEach(el=>{el.value='';});renderProj();" style="margin-left:10px;padding:3px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#f8faff;cursor:pointer;font-size:12px">Filter zurücksetzen</button></td></tr>`;return;}
+  if(!active.length){body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Kein Projekt entspricht dem Filter. <button onclick="_pf={status:'',search:'',team:'',kran:'',av:''};document.querySelectorAll('.filter-row input,.filter-row select').forEach(el=>{el.value='';});renderProj();" style="padding:3px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#f8faff;cursor:pointer;font-size:12px">Filter zurücksetzen</button></td></tr>`;return;}
   empty.style.display='none';twrap.style.display='';
   function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
   function dtFmt(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
@@ -1760,11 +1760,11 @@ function renderGantt(){
   show.forEach(p=>{exp(p.start,p.dauer);[...(p.pl||[]),...(p.va||[]),...(p.bk||[])].forEach(a=>exp(a.start,a.dauer||1));});
   if(minMs===Infinity){out.innerHTML=`<div class="empty"><div class="eico">📅</div><p>Keine Termine vorhanden.</p></div>`;return;}
   // ── Teilansicht: -3 Monate | Zukunft vollständig bis min. N Monate ─
-  const _ganttWindow=window._ganttWindow||'full';
+  const _ganttWindow=window._ganttWindow||'part';
   if(_ganttWindow==='part'){
     const stichVal=document.getElementById('g-stichtag')?.value;
     const refMs=stichVal?new Date(stichVal+'T00:00:00').getTime():new Date().setHours(0,0,0,0);
-    const futureMonths=Math.max(1,parseInt(document.getElementById('g-future-months')?.value)||6);
+    const futureMonths=Math.max(1,parseInt(document.getElementById('g-future-months')?.value)||12);
     minMs=refMs-13*WK; // ca. -3 Monate
     maxMs=refMs+Math.round(futureMonths*4.33)*WK; // exakt N Monate in die Zukunft
   } else {
