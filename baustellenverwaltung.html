@@ -3515,6 +3515,7 @@ const DC_STATUS_CFG = {
 function _dcEnsure(projId){
   if(!S.dc)S.dc={};
   if(!S.dc[projId])S.dc[projId]={items:{},version:'',pruefVon:'',pruefDatum:''};
+  if(!S.dc[projId].items)S.dc[projId].items={};
   return S.dc[projId];
 }
 function _dcGetItem(projId,critId){
