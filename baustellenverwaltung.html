@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -282,15 +282,21 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   .av-projects-grid{grid-template-columns:1fr}
   .item-hint{display:none}
 }
+
+.perm-matrix{border-collapse:collapse;width:100%;font-size:12px}
+.perm-matrix th{background:#f8fafc;padding:8px 10px;text-align:center;font-weight:600;color:#475569;border:1px solid #e2e8f0;white-space:nowrap}
+.perm-matrix td{padding:6px 8px;border:1px solid #e2e8f0;text-align:center}
+.perm-select{padding:3px 6px;border:1px solid #e2e8f0;border-radius:5px;font-size:11px;font-family:inherit;cursor:pointer;background:#fff}
 </style>
 
 <!--[if gte mso 9]><xml>
 <mso:CustomDocumentProperties>
-<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocId>
-<mso:_dlc_DocIdItemGuid msdt:dt="string">ab50b1d9-e42a-4ba1-9882-f18bde6161a2</mso:_dlc_DocIdItemGuid>
-<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-926040, D7FFDUNRZZQD-1481149271-926040</mso:_dlc_DocIdUrl>
+<mso:_dlc_DocId msdt:dt="string">D7FFDUNRZZQD-1481149271-978743</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">bc599d54-b75d-49a2-a345-398570df499f</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://plattnerag.sharepoint.com/sites/projekte/_layouts/15/DocIdRedir.aspx?ID=D7FFDUNRZZQD-1481149271-978743, D7FFDUNRZZQD-1481149271-978743</mso:_dlc_DocIdUrl>
 </mso:CustomDocumentProperties>
 </xml><![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -299,10 +305,12 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div id="login-box">
     <div class="login-ico">🏗️</div>
     <h2>Baustellenverwaltung</h2>
-    <p>Bitte Kennwort eingeben</p>
     <div id="login-loading">⏳ Daten werden geladen…</div>
     <div id="login-form" style="display:none">
-      <input type="password" id="login-pw" placeholder="Kennwort" onkeydown="if(event.key==='Enter')doLogin()">
+      <label class="lbl" style="text-align:left;display:block;margin-bottom:4px;font-size:12px;font-weight:600;color:#475569">Benutzer</label>
+      <select id="login-user-sel" onkeydown="if(event.key==='Enter')document.getElementById('login-pin').focus()" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:14px;background:#fff"></select>
+      <label class="lbl" style="text-align:left;display:block;margin-bottom:4px;font-size:12px;font-weight:600;color:#475569">PIN</label>
+      <input type="password" id="login-pin" inputmode="numeric" maxlength="8" placeholder="••••" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:14px;letter-spacing:6px;text-align:center">
       <button id="login-btn" onclick="doLogin()">Anmelden</button>
       <div id="login-err"></div>
     </div>
@@ -340,23 +348,30 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
     <span class="fs-indicator" id="jb-status" style="display:none;cursor:default">☁️</span>
     <button class="btn bg btn-sm" onclick="jbLoad()" title="Aktuelle Daten von allen Mitarbeitern laden">🔄 Aktualisieren</button>
     <button class="btn bg btn-sm" onclick="document.getElementById('modal-hilfe').classList.add('open')" title="Bedienungsanleitung">❓ Hilfe</button>
-    <button class="btn bg btn-sm" onclick="avShowPinModal('openUsers')" title="Benutzerverwaltung (Admin)">👤 Benutzer</button>
+    <span id="hdr-user-name" style="font-size:12px;font-weight:700;color:#0f766e;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 12px;display:none"></span>
+    <button id="hdr-logout-btn" class="btn bd btn-sm" onclick="doLogout()" style="display:none">🚪 Abmelden</button>
     <button class="btn bg btn-sm" onclick="toggleLang()" id="btn-lang">🇩🇪 DE</button>
     <button class="btn bd btn-sm" onclick="avShowPinModal('reset')" style="font-size:11px;opacity:.7">🗑 Reset</button>
   </div>
 </div>
 
+<div id="dev-banner" style="background:#dc2626;color:#fff;text-align:center;font-size:11px;font-weight:700;padding:3px;letter-spacing:.5px;position:sticky;top:0;z-index:9999">🚧 DEV-VERSION (bauapp_v2_dev) 🚧</div>
 <div id="fs-banner" class="fs-banner" style="display:none"></div>
 
 <div class="tabs">
   <div class="tab active" onclick="switchMainTab('proj')">🏢 Projekte</div>
   <div class="tab" onclick="switchMainTab('gantt')">📊 Gantt</div>
   <div class="tab" onclick="switchMainTab('avcheck')">✅ Arbeitsvorbereitung</div>
+  <div class="tab" onclick="switchMainTab('auslastung')">📦 Auslastung</div>
+  <div class="tab" onclick="switchMainTab('dc')">🏗️ Digital Construction</div>
   <div class="tab" onclick="switchMainTab('archiv')">🗄️ Archiv</div>
   <div class="tab" onclick="switchMainTab('stamm')">📋 Stammdaten</div>
+  <div class="tab" id="tab-admin" onclick="switchMainTab('admin')" style="display:none">⚙️ Admin</div>
 </div>
 
 <div class="content">
+
+<div id="panel-admin" class="panel"><div id="admin-content" style="padding:20px;max-width:900px;margin:0 auto"></div></div>
 
 <!-- ===== STAMMDATEN ===== -->
 <div id="panel-stamm" class="panel">
@@ -408,7 +423,56 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
         </table></div>
       </div>
     </div>
-  </div>
+  
+    <div class="card">
+      <div class="card-title">🏗️ Gerüsttypen</div>
+      <div class="fr2" style="margin-bottom:6px">
+        <div class="fg"><label class="lbl">Name</label><input type="text" id="gt-name" placeholder="z.B. Rahmengerüst"></div>
+        <div class="fg"><label class="lbl">Kapazität m²</label><input type="number" id="gt-menge" min="0" placeholder="5000"></div>
+      </div>
+      <div class="fr2" style="margin-bottom:6px">
+        <div class="fg">
+          <label class="lbl">Klassifizierung</label>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            <button id="gt-besitz-e" onclick="gtSetBesitz('eigentum')" style="padding:5px 14px;border-radius:8px;border:1.5px solid #b45309;background:#b45309;color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">🏠 Eigentum</button>
+            <button id="gt-besitz-m" onclick="gtSetBesitz('miete')" style="padding:5px 14px;border-radius:8px;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">🔑 Miete</button>
+          </div>
+        </div>
+        <div class="fg" id="gt-wp-wrap">
+          <label class="lbl">Wochenpreis €/m²/Woche</label>
+          <input type="number" id="gt-wochenpreis" min="0" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <button class="btn bp" style="width:100%" onclick="saveGerustTyp()">💾 Speichern</button>
+      </div>
+      <div id="gt-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧱 Schalungstypen</div>
+      <div class="fr2" style="margin-bottom:6px">
+        <div class="fg"><label class="lbl">Name</label><input type="text" id="sct-name" placeholder="z.B. Rahmenschalung"></div>
+        <div class="fg"><label class="lbl">Kapazität m²</label><input type="number" id="sct-menge" min="0" placeholder="3000"></div>
+      </div>
+      <div class="fr2" style="margin-bottom:6px">
+        <div class="fg">
+          <label class="lbl">Klassifizierung</label>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            <button id="sct-besitz-e" onclick="sctSetBesitz('eigentum')" style="padding:5px 14px;border-radius:8px;border:1.5px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">🏠 Eigentum</button>
+            <button id="sct-besitz-m" onclick="sctSetBesitz('miete')" style="padding:5px 14px;border-radius:8px;border:1.5px solid #0d9488;background:#fff;color:#0d9488;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">🔑 Miete</button>
+          </div>
+        </div>
+        <div class="fg" id="sct-wp-wrap">
+          <label class="lbl">Wochenpreis €/m²/Woche</label>
+          <input type="number" id="sct-wochenpreis" min="0" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <button class="btn bp" style="width:100%" onclick="saveSchalungTyp()">💾 Speichern</button>
+      </div>
+      <div id="sct-list"></div>
+    </div>
+</div>
   <div style="margin-top:16px"><div class="card">
     <div class="card-title">💾 Datensicherung</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
@@ -1147,9 +1211,9 @@ function toggleLang(){
 // ================================================================
 // STATE
 // ================================================================
-const S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],ids:{pl:1,va:1,bk:1,proj:1,user:1},editing:null,sdedit:{type:null,id:null}};
+const S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],gerust_typen:[],schalung_typen:[],auslastung:[],dc:{},permissions:{},ids:{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1},editing:null,sdedit:{type:null,id:null}};
 let rowCtr=0;
-const APP_KEY='bauapp_v2';
+const APP_KEY='bauapp_v2_dev';
 
 // ================================================================
 // CLOUD SYNC — Firebase Realtime Database
@@ -1187,7 +1251,7 @@ async function jbLoad(){
 }
 
 let _fsHandle=null;
-function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,kranPlan:S.kranPlan||[],ids:S.ids});}
+function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,kranPlan:S.kranPlan||[],gerust_typen:S.gerust_typen||[],schalung_typen:S.schalung_typen||[],auslastung:S.auslastung||[],dc:S.dc||{},permissions:S.permissions||{},ids:S.ids});}
 function saveState(){
   try{localStorage.setItem(APP_KEY,_statePayload());}catch(e){}
   _jbPush();
@@ -1197,7 +1261,7 @@ function clearAllData(){
   localStorage.removeItem(APP_KEY);location.reload();
 }
 function _applyData(d){
-  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];S.users=d.users||[];S.kranPlan=d.kranPlan||[];S.ids=d.ids||{pl:1,va:1,bk:1,proj:1,user:1};
+  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];S.users=d.users||[];S.kranPlan=d.kranPlan||[];S.gerust_typen=d.gerust_typen||[];S.schalung_typen=d.schalung_typen||[];S.auslastung=d.auslastung||[];S.dc=d.dc||{};S.permissions=d.permissions||{};S.ids=d.ids||{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1};
   localStorage.setItem(APP_KEY,_statePayload());
   renderAll();
 }
@@ -1280,7 +1344,7 @@ function importJSON(){
 (function(){
   try{
     const raw=localStorage.getItem(APP_KEY);
-    if(raw){const d=JSON.parse(raw);if(d.pl)S.pl=d.pl;if(d.va)S.va=d.va;if(d.bk)S.bk=d.bk;if(d.proj)S.proj=d.proj;if(d.ids)S.ids=d.ids;if(d.kranPlan)S.kranPlan=d.kranPlan;return;}
+    if(raw){const d=JSON.parse(raw);if(d.pl)S.pl=d.pl;if(d.va)S.va=d.va;if(d.bk)S.bk=d.bk;if(d.proj)S.proj=d.proj;if(d.ids)S.ids=d.ids;if(d.kranPlan)S.kranPlan=d.kranPlan;if(d.gerust_typen)S.gerust_typen=d.gerust_typen;if(d.schalung_typen)S.schalung_typen=d.schalung_typen;if(d.auslastung)S.auslastung=d.auslastung;if(d.dc)S.dc=d.dc;return;}
   }catch(e){}
   // Try migrating from old baufirma_v1
   try{
@@ -1358,9 +1422,12 @@ function roleIcon(r){return r==='Polier'?'🟣':r==='Gruppenführer'?'🟡':'�
 // MAIN TAB SWITCHING
 // ================================================================
 function switchMainTab(tab){
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['proj','gantt','avcheck','archiv','stamm'][i]===tab));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['proj','gantt','avcheck','auslastung','dc','archiv','stamm','admin'][i]===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`panel-${tab}`).classList.add('active');
+  if(tab==='auslastung'){setTimeout(renderAuslastung,0);return;}
+  if(tab==='dc'){setTimeout(renderDC,0);return;}
+  if(tab==='admin'){setTimeout(renderAdminPanel,0);return;}
   if(tab==='gantt'){
     if(window._ganttWindow===undefined){
       window._ganttWindow='part';
@@ -1376,6 +1443,7 @@ function switchMainTab(tab){
   if(tab==='avcheck')renderAVDashboard();
   if(tab==='archiv')renderArchiv();
 }
+
 
 // ================================================================
 // STAMMDATEN
@@ -1458,9 +1526,7 @@ function renderProj(){
     if(_pf.av==='part')return pct>0&&pct<100;
     if(_pf.av==='100')return pct>=100;
     return true;});
-  if(!active.length){body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Kein Projekt entspricht dem Filter. <button onclick="_pf={status:'',search:'',team:'',kran:'',av:''};document.querySelectorAll('.filter-row input,.filter-row select').forEach(el=>{el.value='';});renderProj();" style="padding:3px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#f8faff;cursor:pointer;font-size:12px">Filter zurücksetzen</button></td></tr>`;return;}
-  empty.style.display='none';twrap.style.display='';
-  function sn(full){if(!full)return'';const pts=full.trim().split(/\s+/);return pts.length>1?pts[0][0]+'.'+pts[pts.length-1]:pts[0];}
+  if(!active.length){body.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Kein Projekt entspricht dem Filter. <button onclick="_pf={status:'',search:'',team:'',kran:'',av:''};document.querySelectorAll('.filter-row input,.filter-row select').forEach(el=>{el.value='';});renderProj();" style="padding:3px 10px;border:1px solid #cbd5e1;border-radius:5px;background:#f8faff;cursor:pointer;font-size:12px">Filter zurücksetzen</button></td></tr>`;return;}
   function dtFmt(iso){if(!iso)return'–';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});}
   function bdg(cls,icon,name){return`<span class="bdg ${cls}" style="font-size:10px">${icon} ${name}</span>`;}
   function kranPlanRow(kranId,projId){
@@ -1482,8 +1548,8 @@ function renderProj(){
       ?'<span style="color:#94a3b8;font-size:11px">–</span>'
       :`<span class="av-pct" style="color:${pctColor}">${pct}%</span>`;
     const avBtn=isPot
-      ?'<button class="btn bg btn-xs" style="opacity:.4;cursor:not-allowed">✅</button>'
-      :`<button class="btn bg btn-xs" title="Checkliste" onclick="switchMainTab('avcheck');openAVProject(${p.id})">✅</button>`;
+      ?'<button class="btn btn-xs" style="background:#4f46e5;color:#fff;border:none;border-radius:4px;cursor:not-allowed;padding:3px 6px;font-size:11px;opacity:.4">AV</button>'
+      :`<button class="btn btn-xs" onclick="switchMainTab('avcheck');openAVProject(${p.id})" title="Arbeitsvorbereitung" style="background:#4f46e5;color:#fff;border:none;border-radius:4px;cursor:pointer;padding:3px 6px;font-size:11px">AV</button>`;
     const plRows=(p.pl||[]).map(a=>`<div>${bdg('b-pl','👷',plName(a.id))}</div>`).join('');
     const polierRows=(p.va||[]).filter(a=>vaRole(a.id)==='Polier').map(a=>`<div>${bdg('b-polier','🟣',vaName(a.id))}</div>`).join('');
     const vaRows=(p.va||[]).filter(a=>vaRole(a.id)==='Vorarbeiter').map(a=>`<div>${bdg('b-va','🔨',vaName(a.id))}</div>`).join('');
@@ -1510,6 +1576,7 @@ function renderProj(){
       <td style="padding:4px 4px;vertical-align:middle"><div class="tact">
         <button class="btn bg btn-xs" onclick="openModal(${p.id})" title="Bearbeiten">✏️</button>
         ${avBtn}
+        ${(p.status||'auftrag')==='auftrag'?`<button class="btn btn-xs" onclick="switchMainTab('dc');setTimeout(()=>openDCProject(${p.id}),50)" title="Digital Construction" style="background:#0f766e;color:#fff;border:none;border-radius:4px;cursor:pointer;padding:3px 6px;font-size:11px">🏗️ DC</button>`:''}
         <button class="btn bd btn-xs" onclick="delProj(${p.id})" title="Löschen">🗑</button>
       </div></td></tr>`;
   }).join('');
@@ -1764,7 +1831,18 @@ function renderGantt(){
   if(type==='baustelle'&&fvArr.length)show=S.proj.filter(p=>fvArr.includes(p.id));
   else if(type==='pl'&&fvArr.length)show=S.proj.filter(p=>(p.pl||[]).some(a=>fvArr.includes(a.id)));
   else if(isVAfilter&&fvArr.length)show=S.proj.filter(p=>(p.va||[]).some(a=>fvArr.includes(a.id)));
-  else if(isBKfilter&&fvArr.length)show=S.proj.filter(p=>(p.bk||[]).some(a=>fvArr.includes(a.id)));
+  else if(isBKfilter&&fvArr.length){
+    show=S.proj.filter(p=>(p.bk||[]).some(a=>fvArr.includes(a.id)));
+    // Auch Projekte einschliessen, die diesen Kran per Versetzung erhalten (nur gestrichelte Zeile)
+    const showIds=new Set(show.map(p=>p.id));
+    const relocOnlyIds=new Set(S.proj
+      .filter(p=>!showIds.has(p.id)&&(S.kranPlan||[]).some(kp=>kp.nachProjId===p.id&&fvArr.includes(kp.kranId)))
+      .map(p=>p.id));
+    const relocTargets=S.proj.filter(p=>relocOnlyIds.has(p.id));
+    show=[...show,...relocTargets];
+    window._ganttRelocOnlyIds=relocOnlyIds; // merken für Row-Rendering
+  }
+  if(!isBKfilter||!fvArr.length)window._ganttRelocOnlyIds=new Set();
   if(!show.length){out.innerHTML=`<div class="empty"><div class="eico">🔍</div><p>Keine Daten für diesen Filter.</p></div>`;return;}
   let minMs=Infinity,maxMs=-Infinity;
   function exp(ws,dur){const ms=w2ms(ws);if(!ms)return;minMs=Math.min(minMs,ms);maxMs=Math.max(maxMs,ms+(dur||1)*WK);}
@@ -1810,7 +1888,7 @@ function renderGantt(){
     if(F.proj)rows.push({t:'proj',p,ind:0});
     if(F.pl)(p.pl||[]).forEach(a=>rows.push({t:'pl',p,a,ind:1}));
     (p.va||[]).forEach(a=>{if(vaVis(a.id))rows.push({t:'va',p,a,ind:1});});
-    (p.bk||[]).forEach(a=>{if(bkVis(a.id))rows.push({t:'bk',p,a,ind:1});});
+    (p.bk||[]).forEach(a=>{if(bkVis(a.id)&&!(window._ganttRelocOnlyIds&&window._ganttRelocOnlyIds.has(p.id)))rows.push({t:'bk',p,a,ind:1});});
     (S.kranPlan||[]).filter(kp=>kp.nachProjId===p.id).forEach(kp=>{
       if(F.kranplan){const vonP=S.proj.find(pp=>pp.id===kp.vonProjId);rows.push({t:'bk-plan',p,kranId:kp.kranId,vonP,ind:1});}
     });
@@ -2348,24 +2426,37 @@ function checkLoginRequired(){
   const frm=document.getElementById('login-form');
   const ldg=document.getElementById('login-loading');
   if(S.users.length===0){ov.style.display='none';return;}
-  const storedPw=sessionStorage.getItem('bau_user_pw');
-  const stillValid=storedPw&&S.users.find(u=>u.pw===storedPw);
-  if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){ov.style.display='none';return;}
-  // Session ungültig (Benutzer gelöscht) → neu anmelden
-  sessionStorage.removeItem('bau_logged');sessionStorage.removeItem('bau_user_pw');
+  const uid=+sessionStorage.getItem('bau_user_id');
+  const stillValid=uid&&S.users.find(u=>u.id===uid);
+  if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){
+    _afterLoginSetup(uid);
+    ov.style.display='none';return;
+  }
+  // Session ungültig
+  sessionStorage.removeItem('bau_logged');sessionStorage.removeItem('bau_user_id');
+  _renderLoginPicker();
   ov.style.display='flex';ldg.style.display='none';frm.style.display='block';
-  setTimeout(()=>document.getElementById('login-pw')?.focus(),100);
+  setTimeout(()=>document.getElementById('login-user-sel')?.focus(),100);
 }
 function doLogin(){
-  const pw=document.getElementById('login-pw').value.trim();
+  const sel=document.getElementById('login-user-sel');
+  const uid=+sel.value;
+  const pin=document.getElementById('login-pin').value.trim();
   const err=document.getElementById('login-err');
-  const match=S.users.find(u=>u.pw===pw);
-  if(!match){err.textContent='❌ Falsches Kennwort';document.getElementById('login-pw').value='';document.getElementById('login-pw').focus();return;}
+  err.textContent='';
+  if(!uid){err.textContent='⚠️ Bitte Benutzer wählen';return;}
+  if(!pin){err.textContent='⚠️ Bitte PIN eingeben';return;}
+  const user=S.users.find(u=>u.id===uid);
+  if(!user){err.textContent='❌ Benutzer nicht gefunden';return;}
+  const stored=user.pin||user.pw||'';
+  if(!stored){err.textContent='⚠️ Kein PIN gesetzt – bitte Admin kontaktieren';return;}
+  if(stored!==pin){err.textContent='❌ Falscher PIN';document.getElementById('login-pin').value='';document.getElementById('login-pin').focus();return;}
   sessionStorage.setItem('bau_logged','1');
-  sessionStorage.setItem('bau_user_pw',match.pw);
+  sessionStorage.setItem('bau_user_id',uid);
   document.getElementById('login-overlay').style.display='none';
   err.textContent='';
-  showToast('👋 Willkommen, '+match.name+'!');
+  _afterLoginSetup(uid);
+  showToast('👋 Willkommen, '+user.name+'!');
 }
 let _editUserIdx=null;
 function renderUsers(){
@@ -2458,9 +2549,9 @@ function _checkKPConflict(){
   const nachP=S.proj.find(p=>p.id==nachProjId);
   const conflicts=[];
   if(nachP&&(nachP.bk||[]).some(a=>a.id==kranId))
-    conflicts.push('⚠️ '+bkName(kranId)+' ist bereits effektiv in „'+nachP.name+'“ eingeplant.');
+    conflicts.push('⚠️ '+bkName(kranId)+' ist bereits effektiv in „'+nachP.name+'" eingeplant.');
   const dup=(S.kranPlan||[]).filter(kp=>kp.kranId==kranId&&kp.nachProjId==nachProjId&&kp.id!==editId);
-  if(dup.length){const vonP2=S.proj.find(p=>p.id==dup[0].vonProjId);conflicts.push('⚠️ Dieser Kran ist von „'+(vonP2?.name||'?')+'“ bereits nach „'+(nachP?.name||'?')+'“ geplant.');}
+  if(dup.length){const vonP2=S.proj.find(p=>p.id==dup[0].vonProjId);conflicts.push('⚠️ Dieser Kran ist von „'+(vonP2?.name||'?')+'" bereits nach „'+(nachP?.name||'?')+'" geplant.');}
   warn.innerHTML=conflicts.join('<br>');warn.style.display=conflicts.length?'':'none';
 }
 function saveKranPlan(){
@@ -2476,13 +2567,19 @@ function delKranPlan(id){
   S.kranPlan=(S.kranPlan||[]).filter(kp=>kp.id!==id);
   saveState();renderProj();renderGantt();showToast('✅ Planung entfernt');
 }
-function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv();}
+function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv();if(typeof renderGerustTypen==='function')renderGerustTypen();if(typeof renderSchalungTypen==='function')renderSchalungTypen();if(typeof renderAuslastung==='function')renderAuslastung();
+        if(typeof renderDC==='function')renderDC();}
 // Login-Overlay sofort zeigen während Daten laden
 (function(){
   const ov=document.getElementById('login-overlay');
   // Aus localStorage laden um Benutzerliste sofort zu kennen
-  try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;}}catch(e){}
-  if(S.users.length>0&&!sessionStorage.getItem('bau_logged')){
+  try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}}catch(e){}
+  const uid=+sessionStorage.getItem('bau_user_id');
+  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&uid&&S.users.find(u=>u.id===uid)){
+    // Restore session immediately
+    setTimeout(()=>_afterLoginSetup(uid),0);
+  } else if(S.users.length>0){
+    _renderLoginPicker();
     ov.style.display='flex';
   }
 })();
@@ -2506,5 +2603,1349 @@ jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
     </div>
   </div>
 </div>
+
+<!-- ===== DIGITAL CONSTRUCTION ===== -->
+<div id="panel-dc" class="panel">
+  <!-- DC Dashboard -->
+  <div id="dc-dashboard">
+    <div class="sh">
+      <div class="st">🏗️ Digital Construction – Qualitätsprüfung</div>
+    </div>
+    <div class="av-stats-bar">
+      <div class="av-stat"><div class="val" id="dc-stat-total">0</div><div class="lbl">Aufträge gesamt</div></div>
+      <div class="av-stat green"><div class="val" id="dc-stat-ok">0</div><div class="lbl">Kriterien OK</div></div>
+      <div class="av-stat yellow"><div class="val" id="dc-stat-open">0</div><div class="lbl">Offen / Klärung</div></div>
+      <div class="av-stat red"><div class="val" id="dc-stat-fehlt">0</div><div class="lbl">Fehlt</div></div>
+    </div>
+    <div class="av-projects-grid" id="dc-projects-grid"></div>
+  </div>
+  <!-- DC Detail -->
+  <div id="dc-detail" style="display:none">
+    <div class="sh">
+      <button class="btn bg btn-sm" onclick="closeDCDetail()" style="margin-right:8px">← Übersicht</button>
+      <div class="st" id="dc-detail-title">Digital Construction</div>
+    </div>
+    <div id="dc-content"></div>
+  </div>
+</div>
+<!-- ===== AUSLASTUNG ===== -->
+<div id="panel-auslastung" class="panel">
+  <div class="sh" style="align-items:center">
+    <div class="st">📦 Auslastungsplanung</div>
+    <div style="display:flex;gap:4px;margin-left:auto">
+      <button id="al-vm-month" onclick="setAlViewMode('month')" style="padding:4px 12px;border-radius:6px;border:1.5px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">📅 Monate</button>
+      <button id="al-vm-week"  onclick="setAlViewMode('week')"  style="padding:4px 12px;border-radius:6px;border:1.5px solid #1d4ed8;background:#fff;color:#1d4ed8;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">📅 Wochen</button>
+      <span style="width:1px;background:#e2e8f0;margin:0 2px;align-self:stretch"></span>
+      <button id="al-du-m2"   onclick="setAlDispUnit('m2')"   style="padding:4px 10px;border-radius:6px;border:1.5px solid #475569;background:#475569;color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">m²</button>
+      <button id="al-du-euro" onclick="setAlDispUnit('euro')" style="padding:4px 10px;border-radius:6px;border:1.5px solid #475569;background:#fff;color:#475569;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">€</button>
+      <button id="al-du-both" onclick="setAlDispUnit('beide')" style="padding:4px 10px;border-radius:6px;border:1.5px solid #475569;background:#fff;color:#475569;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">m²+€</button>
+    </div>
+  </div>
+  <div id="al-flags" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 0 10px"></div>
+  <div id="al-chart-wrap" style="height:260px;position:relative;margin-bottom:16px;display:none"><canvas id="al-chart"></canvas></div>
+  <div id="auslastung-out" style="overflow-x:auto"></div>
+</div>
+
+<!-- ===== Planungs-Modal ===== -->
+<div class="overlay" id="modal-alplan" onclick="if(event.target===this)closeAlPlanModal()">
+<div class="modal" style="max-width:900px;max-height:90vh;overflow-y:auto">
+  <div class="mhd">
+    <div class="mtitle" id="alp-title">Planung</div>
+    <button class="mclose" onclick="closeAlPlanModal()">✕</button>
+  </div>
+  <div style="padding:16px 20px">
+    <!-- Projekt picker (if opened without project) -->
+    <div id="alp-proj-pick" style="display:none;margin-bottom:12px">
+      <label class="lbl">Projekt auswählen</label>
+      <select id="alp-proj-sel" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-family:inherit">
+        <option value="">– Projekt wählen –</option>
+      </select>
+    </div>
+    <!-- Bedarf -->
+    <div class="fr2" style="margin-bottom:12px">
+      <div class="fg"><label class="lbl">Gesamtbedarf (m²)</label>
+        <input type="number" id="alp-bedarf-inp" min="0" placeholder="0"
+          style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;box-sizing:border-box"
+          oninput="_alpUpdateSum()">
+      </div>
+      <div class="fg">
+        <label class="lbl">Verteilen: Von</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <select id="alp-von" onchange="_alpHighlightRange()" style="flex:1;padding:6px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-family:inherit"></select>
+          <input type="text" id="alp-kw-von" placeholder="KW" style="width:52px;padding:5px 4px;border:1px solid #cbd5e1;border-radius:6px;font-size:11px;text-align:center" oninput="_alpKwInput('von')">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="lbl">Bis</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <select id="alp-bis" onchange="_alpHighlightRange()" style="flex:1;padding:6px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-family:inherit"></select>
+          <input type="text" id="alp-kw-bis" placeholder="KW" style="width:52px;padding:5px 4px;border:1px solid #cbd5e1;border-radius:6px;font-size:11px;text-align:center" oninput="_alpKwInput('bis')">
+        </div>
+      </div>
+    </div>
+    <div class="fr2" style="margin-bottom:10px;align-items:center">
+      <div class="fg">
+        <label class="lbl">Gleichmäßig verteilen – Menge/Periode</label>
+        <input type="number" id="alp-menge" min="0" placeholder="m² je Periode"
+          style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;box-sizing:border-box">
+      </div>
+      <div class="fg" style="display:flex;gap:6px;align-items:flex-end">
+        <button class="btn bp" onclick="alpVerteilen()" style="flex:1">⚡ Verteilen</button>
+        <button id="alp-undo-btn" class="btn bg" onclick="alpUndo()" style="display:none">↩ Undo</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#475569;margin-bottom:8px">
+      Summe: <strong id="alp-sum">0</strong> m²
+      <span id="alp-pct" style="margin-left:8px"></span>
+    </div>
+    <div id="alp-grid-lbl" style="font-size:12px;color:#475569;margin-bottom:6px;font-weight:600">Mengen (m²)</div>
+    <div id="alp-grid"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button id="alp-del-btn" class="btn" onclick="alpDelete()" style="background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;display:none">🗑 Planung löschen</button>
+      <button class="btn bg" onclick="closeAlPlanModal()">Abbrechen</button>
+      <button class="btn bp" onclick="alpSave()">💾 Speichern</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STAMMDATEN: Gerüsttypen + Schalungstypen
+// ════════════════════════════════════════════════════════
+function gtSetBesitz(v){
+  window._gtBesitz=v;
+  const bE=document.getElementById('gt-besitz-e'),bM=document.getElementById('gt-besitz-m');
+  if(bE){bE.style.background=v==='eigentum'?'#b45309':'#fff';bE.style.color=v==='eigentum'?'#fff':'#b45309';}
+  if(bM){bM.style.background=v==='miete'?'#7c3aed':'#fff';bM.style.color=v==='miete'?'#fff':'#7c3aed';}
+}
+function saveGerustTyp(editId){
+  const name=(document.getElementById('gt-name').value||'').trim();
+  const menge=Math.max(0,parseFloat(document.getElementById('gt-menge').value)||0);
+  const besitz=(window._gtBesitz||'eigentum');
+  const wochenpreis=Math.max(0,parseFloat(document.getElementById('gt-wochenpreis').value)||0);
+  if(!name||!menge){showToast('⚠️ Name und Menge erforderlich');return;}
+  if(!S.gerust_typen)S.gerust_typen=[];
+  if(editId){
+    const t=S.gerust_typen.find(t=>t.id===editId);
+    if(t){t.name=name;t.menge=menge;t.besitz=besitz;t.wochenpreis=wochenpreis;}
+  }else{
+    S.gerust_typen.push({id:S.ids.gt++,name,menge,besitz,wochenpreis});
+  }
+  document.getElementById('gt-name').value='';
+  document.getElementById('gt-menge').value='';
+  document.getElementById('gt-wochenpreis').value='';
+  gtSetBesitz('eigentum');
+  const btn=document.querySelector('[onclick^="saveGerustTyp"]');
+  if(btn&&btn.textContent.includes('Aktualisieren')){btn.setAttribute('onclick','saveGerustTyp()');btn.textContent='💾 Speichern';}
+  saveState();renderGerustTypen();renderSchalungTypen();
+}
+function renderGerustTypen(){
+  const el=document.getElementById('gt-list');if(!el)return;
+  const list=S.gerust_typen||[];
+  if(!list.length){el.innerHTML='<p style="color:#94a3b8;font-size:12px">Noch keine Gerüsttypen.</p>';return;}
+  el.innerHTML=list.map(t=>{
+    const isMiete=(t.besitz||'eigentum')==='miete';
+    const col=isMiete?'#7c3aed':'#b45309';
+    const tag=isMiete?'<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:#ede9fe;color:#7c3aed;font-weight:700">🔑 Miete</span>':'<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:#fef3c7;color:#b45309;font-weight:700">🏠 Eigentum</span>';
+    const preisInfo=t.wochenpreis?`<span style="font-size:10px;color:${col}"> · ${t.wochenpreis.toLocaleString('de-AT',{minimumFractionDigits:2})} €/m²/Woche</span>`:'';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+    <span style="font-size:13px">🏗️</span>
+    <span style="flex:1;font-size:13px;font-weight:600;color:${col}">${esc(t.name)}</span>
+    ${tag}
+    <span style="font-size:11px;color:#475569">${t.menge.toLocaleString('de-AT')} m²</span>${preisInfo}
+    <button onclick="editGerustTyp(${t.id})" style="font-size:10px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;cursor:pointer">✏️</button>
+    <button onclick="delGerustTyp(${t.id})" style="font-size:10px;padding:2px 6px;border:1px solid #fca5a5;border-radius:4px;background:#fff;color:#dc2626;cursor:pointer">🗑</button>
+  </div>`;
+  }).join('');
+}
+function editGerustTyp(id){
+  const t=S.gerust_typen.find(t=>t.id===id);if(!t)return;
+  document.getElementById('gt-name').value=t.name;
+  document.getElementById('gt-menge').value=t.menge;
+  gtSetBesitz(t.besitz||'eigentum');
+  const wp=document.getElementById('gt-wochenpreis');if(wp)wp.value=t.wochenpreis||0;
+  const btn=document.querySelector('[onclick="saveGerustTyp()"]');
+  if(btn){btn.setAttribute('onclick',`saveGerustTyp(${id})`);btn.textContent='✔ Aktualisieren';}
+}
+function delGerustTyp(id){
+  if(!confirm('Gerüsttyp löschen?'))return;
+  S.gerust_typen=S.gerust_typen.filter(t=>t.id!==id);
+  saveState();renderGerustTypen();renderAuslastung();
+}
+
+function sctSetBesitz(v){
+  window._sctBesitz=v;
+  const bE=document.getElementById('sct-besitz-e'),bM=document.getElementById('sct-besitz-m');
+  if(bE){bE.style.background=v==='eigentum'?'#1d4ed8':'#fff';bE.style.color=v==='eigentum'?'#fff':'#1d4ed8';}
+  if(bM){bM.style.background=v==='miete'?'#0d9488':'#fff';bM.style.color=v==='miete'?'#fff':'#0d9488';}
+}
+function saveSchalungTyp(editId){
+  const name=(document.getElementById('sct-name').value||'').trim();
+  const menge=Math.max(0,parseFloat(document.getElementById('sct-menge').value)||0);
+  const besitz=(window._sctBesitz||'eigentum');
+  const wochenpreis=Math.max(0,parseFloat(document.getElementById('sct-wochenpreis').value)||0);
+  if(!name||!menge){showToast('⚠️ Name und Menge erforderlich');return;}
+  if(!S.schalung_typen)S.schalung_typen=[];
+  if(editId){
+    const t=S.schalung_typen.find(t=>t.id===editId);
+    if(t){t.name=name;t.menge=menge;t.besitz=besitz;t.wochenpreis=wochenpreis;}
+  }else{
+    S.schalung_typen.push({id:S.ids.st++,name,menge,besitz,wochenpreis});
+  }
+  document.getElementById('sct-name').value='';
+  document.getElementById('sct-menge').value='';
+  document.getElementById('sct-wochenpreis').value='';
+  sctSetBesitz('eigentum');
+  const btn=document.querySelector('[onclick^="saveSchalungTyp"]');
+  if(btn&&btn.textContent.includes('Aktualisieren')){btn.setAttribute('onclick','saveSchalungTyp()');btn.textContent='💾 Speichern';}
+  saveState();renderSchalungTypen();renderAuslastung();
+}
+function renderSchalungTypen(){
+  const el=document.getElementById('sct-list');if(!el)return;
+  const list=S.schalung_typen||[];
+  if(!list.length){el.innerHTML='<p style="color:#94a3b8;font-size:12px">Noch keine Schalungstypen.</p>';return;}
+  el.innerHTML=list.map(t=>{
+    const isMiete=(t.besitz||'eigentum')==='miete';
+    const col=isMiete?'#0d9488':'#1d4ed8';
+    const tag=isMiete?'<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:#ccfbf1;color:#0d9488;font-weight:700">🔑 Miete</span>':'<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:#dbeafe;color:#1d4ed8;font-weight:700">🏠 Eigentum</span>';
+    const preisInfo=t.wochenpreis?`<span style="font-size:10px;color:${col}"> · ${t.wochenpreis.toLocaleString('de-AT',{minimumFractionDigits:2})} €/m²/Woche</span>`:'';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+    <span style="font-size:13px">🧱</span>
+    <span style="flex:1;font-size:13px;font-weight:600;color:${col}">${esc(t.name)}</span>
+    ${tag}
+    <span style="font-size:11px;color:#475569">${t.menge.toLocaleString('de-AT')} m²</span>${preisInfo}
+    <button onclick="editSchalungTyp(${t.id})" style="font-size:10px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;cursor:pointer">✏️</button>
+    <button onclick="delSchalungTyp(${t.id})" style="font-size:10px;padding:2px 6px;border:1px solid #fca5a5;border-radius:4px;background:#fff;color:#dc2626;cursor:pointer">🗑</button>
+  </div>`;
+  }).join('');
+}
+function editSchalungTyp(id){
+  const t=S.schalung_typen.find(t=>t.id===id);if(!t)return;
+  document.getElementById('sct-name').value=t.name;
+  document.getElementById('sct-menge').value=t.menge;
+  sctSetBesitz(t.besitz||'eigentum');
+  const wp=document.getElementById('sct-wochenpreis');if(wp)wp.value=t.wochenpreis||0;
+  const btn=document.querySelector('[onclick="saveSchalungTyp()"]');
+  if(btn){btn.setAttribute('onclick',`saveSchalungTyp(${id})`);btn.textContent='✔ Aktualisieren';}
+}
+function delSchalungTyp(id){
+  if(!confirm('Schalungstyp löschen?'))return;
+  S.schalung_typen=S.schalung_typen.filter(t=>t.id!==id);
+  saveState();renderSchalungTypen();renderAuslastung();
+}
+
+// ════════════════════════════════════════════════════════
+// AUSLASTUNG — Helper utilities
+// ════════════════════════════════════════════════════════
+function _isoWeekInfo(d){
+  const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=dt.getUTCDay()||7;dt.setUTCDate(dt.getUTCDate()+4-day);
+  const y1=new Date(Date.UTC(dt.getUTCFullYear(),0,1));
+  return{week:Math.ceil((((dt-y1)/86400000)+1)/7),year:dt.getUTCFullYear()};
+}
+function _weekKey(d){const{week,year}=_isoWeekInfo(d);return `${year}-W${String(week).padStart(2,'0')}`;}
+function _weekKeyDate(key){
+  const[yr,wk]=key.split('-W');const y=+yr,w=+wk;
+  const jan4=new Date(Date.UTC(y,0,4));const dow=jan4.getUTCDay()||7;
+  const d=new Date(jan4);d.setUTCDate(jan4.getUTCDate()-dow+1+(w-1)*7);return d;
+}
+function _weeksInMonth(yr,mo){
+  let count=0;const d=new Date(yr,mo,1);
+  while(d.getMonth()===mo){if(d.getDay()===4)count++;d.setDate(d.getDate()+1);}
+  return count||4;
+}
+function _alGetUnits(){
+  const mode=window._alViewMode||'month';
+  const today=new Date();const units=[];
+  if(mode==='month'){
+    for(let i=-1;i<=17;i++){const d=new Date(today.getFullYear(),today.getMonth()+i,1);
+      units.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);}
+  }else{
+    const startD=new Date(today);startD.setDate(today.getDate()-14);
+    for(let i=0;i<55;i++){const d=new Date(startD);d.setDate(startD.getDate()+i*7);units.push(_weekKey(d));}
+  }
+  return units;
+}
+function _alUnitLabel(key){
+  const mo=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  if(key.includes('-W')){const[yr,wk]=key.split('-W');return `KW ${+wk}<br><small style="font-weight:400;font-size:9px">${yr.slice(2)}</small>`;}
+  const[yr,m]=key.split('-');return `${mo[+m-1]}<br><small style="font-weight:400;font-size:9px">${yr.slice(2)}</small>`;
+}
+function _alTodayKey(){
+  const today=new Date();
+  if((window._alViewMode||'month')==='week')return _weekKey(today);
+  return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+}
+// BI-DIRECTIONAL: week falls back to monate, month falls back to sum of wochen
+function _alGetVal(entry,key){
+  if(!entry)return 0;
+  if(key.includes('-W')){
+    const v=(entry.wochen&&entry.wochen[key])||0;if(v)return v;
+    // fallback: derive from monthly value divided across weeks in that month
+    const d=_weekKeyDate(key);
+    const mKey=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const mVal=(entry.monate&&entry.monate[mKey])||0;if(!mVal)return 0;
+    return Math.round(mVal/_weeksInMonth(d.getFullYear(),d.getMonth()));
+  }else{
+    const v=(entry.monate&&entry.monate[key])||0;if(v)return v;
+    // fallback: sum weekly values that belong to this month
+    if(!entry.wochen)return 0;
+    const[yr,mo]=key.split('-').map(Number);
+    return Object.entries(entry.wochen).reduce((sum,[wk,wv])=>{
+      if(!wk.includes('-W'))return sum;
+      const d=_weekKeyDate(wk);
+      return(d.getFullYear()===yr&&d.getMonth()===mo-1)?sum+(wv||0):sum;
+    },0);
+  }
+}
+function _alSetVal(entry,key,val){
+  const field=key.includes('-W')?'wochen':'monate';
+  if(!entry[field])entry[field]={};
+  if(val>0)entry[field][key]=val;else delete entry[field][key];
+}
+// Display value for table: month view shows MAX weekly value in month
+function _alDisplayVal(entry,key){
+  if(!entry)return 0;
+  if(key.includes('-W')){
+    // Week mode: same as _alGetVal
+    return _alGetVal(entry,key);
+  }else{
+    // Month mode: MAX of weekly values within this month
+    const[yr,mo]=key.split('-').map(Number);
+    // First collect all weeks in this month from wochen
+    if(entry.wochen&&Object.keys(entry.wochen).length){
+      let max=0;
+      Object.entries(entry.wochen).forEach(([wk,wv])=>{
+        if(!wk.includes('-W'))return;
+        const d=_weekKeyDate(wk);
+        if(d.getFullYear()===yr&&d.getMonth()===mo-1)max=Math.max(max,wv||0);
+      });
+      if(max>0)return max;
+    }
+    // Fallback: explicit monthly value (as-is, already a single value)
+    return(entry.monate&&entry.monate[key])||0;
+  }
+}
+
+function _alFindEntry(projId,kat,typId){
+  return(S.auslastung||[]).find(a=>a.projId===projId&&a.typId===typId&&
+    (a.kat===kat||(kat==='schalung'&&(a.kat==='mauerschalung'||a.kat==='deckenschalung'))))||null;
+}
+function _alEnsureEntry(projId,kat,typId){
+  let e=_alFindEntry(projId,kat,typId);
+  if(!e){
+    if(!S.auslastung)S.auslastung=[];
+    if(!S.ids.al)S.ids.al=1;
+    e={id:S.ids.al++,projId,kat,typId,monate:{},wochen:{}};S.auslastung.push(e);
+  }
+  if(!e.monate)e.monate={};if(!e.wochen)e.wochen={};
+  return e;
+}
+function _alAllTypes(){
+  const gt=(S.gerust_typen||[]).map(t=>{
+    const isMiete=(t.besitz||'eigentum')==='miete';
+    return{...t,kat:'gerust',icon:isMiete?'🔑🏗️':'🏗️',
+      color:isMiete?'#7c3aed':'#b45309',bg:isMiete?'#ede9fe':'#fef3c7'};
+  });
+  const st=(S.schalung_typen||[]).map(t=>{
+    const isMiete=(t.besitz||'eigentum')==='miete';
+    return{...t,kat:'schalung',icon:isMiete?'🔑🧱':'🧱',
+      color:isMiete?'#0d9488':'#1d4ed8',bg:isMiete?'#ccfbf1':'#dbeafe'};
+  });
+  return [...gt,...st];
+}
+function _alKey(t){return `${t.kat}-${t.id}`;}
+function _alIsOn(key){return (window._alActive||{})[key]!==false;}
+function toggleAlFlag(key){
+  if(!window._alActive)window._alActive={};
+  window._alActive[key]=!_alIsOn(key);
+  renderAuslastung();
+}
+function setAlViewMode(mode){
+  window._alViewMode=mode;
+  if(window._alChart){window._alChart.destroy();window._alChart=null;}
+  const bM=document.getElementById('al-vm-month'),bW=document.getElementById('al-vm-week');
+  if(bM){bM.style.background=mode==='month'?'#1d4ed8':'#fff';bM.style.color=mode==='month'?'#fff':'#1d4ed8';}
+  if(bW){bW.style.background=mode==='week'?'#1d4ed8':'#fff';bW.style.color=mode==='week'?'#fff':'#1d4ed8';}
+  renderAuslastung();
+}
+function setAlDispUnit(unit){
+  window._alDispUnit=unit;
+  const ac='#475569',ic='#fff';
+  const bM2=document.getElementById('al-du-m2'),bEu=document.getElementById('al-du-euro'),bBt=document.getElementById('al-du-both');
+  if(bM2){bM2.style.background=unit==='m2'?ac:ic;bM2.style.color=unit==='m2'?ic:ac;}
+  if(bEu){bEu.style.background=unit==='euro'?ac:ic;bEu.style.color=unit==='euro'?ic:ac;}
+  if(bBt){bBt.style.background=unit==='beide'?ac:ic;bBt.style.color=unit==='beide'?ic:ac;}
+  renderAuslastung();
+}
+// Euro cost helper: wk mode = m² × wochenpreis; month mode = SUM(wochen×preis)
+function _alEuroVal(entry,key,typ){
+  if(!typ||!typ.wochenpreis)return 0;
+  if(!entry)return 0;
+  const wp=typ.wochenpreis;
+  if(key.includes('-W')){return (_alGetVal(entry,key)||0)*wp;}
+  // month: sum all weekly costs
+  const[yr,mo]=key.split('-').map(Number);
+  let sum=0;
+  if(entry.wochen){
+    Object.entries(entry.wochen).forEach(([wk,wv])=>{
+      if(!wk.includes('-W'))return;
+      const d=_weekKeyDate(wk);
+      if(d.getFullYear()===yr&&d.getMonth()===mo-1)sum+=(wv||0)*wp;
+    });
+  }
+  if(!sum&&entry.monate&&entry.monate[key]){
+    sum=entry.monate[key]*wp*_weeksInMonth(yr,mo-1);
+  }
+  return sum;
+}
+
+// ════════════════════════════════════════════════════════
+// AUSLASTUNG — Main render
+// ════════════════════════════════════════════════════════
+
+function renderAuslastungChart(){
+  const wrap=document.getElementById('al-chart-wrap');
+  const canvas=document.getElementById('al-chart');
+  if(!wrap||!canvas)return;
+  const activeTypes=_alAllTypes().filter(t=>_alIsOn(_alKey(t)));
+  if(!activeTypes.length){if(window._alChart){window._alChart.destroy();window._alChart=null;}wrap.style.display='none';return;}
+  const units=_alGetUnits();
+  const projekte=(S.proj||[]).filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+  const datasets=activeTypes.map(typ=>{
+    const kap=typ.menge;
+    const col=typ.color;
+    return{
+      label:`${typ.icon} ${typ.name}`,
+      data:units.map(u=>{const tot=projekte.reduce((s,p)=>s+_alDisplayVal(_alFindEntry(p.id,typ.kat,typ.id),u),0);return kap?Math.round(tot/kap*100):0;}),
+      borderColor:col,backgroundColor:col+'22',borderWidth:2.5,
+      pointRadius:3,pointHoverRadius:6,tension:0.35,fill:false
+    };
+  });
+  datasets.push({
+    label:'Kapazität 100%',
+    data:units.map(()=>100),
+    borderColor:'#dc2626',borderWidth:1.5,
+    borderDash:[6,3],pointRadius:0,fill:false,tension:0
+  });
+  const labels=units.map(u=>_alUnitLabel(u).replace('<br>',' ').replace(/<[^>]+>/g,''));
+  if(window._alChart){window._alChart.destroy();window._alChart=null;}
+  wrap.style.display='';
+  window._alChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11},boxWidth:14,padding:10}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y}%`}}
+      },
+      scales:{
+        y:{min:0,suggestedMax:120,
+          ticks:{callback:v=>v+'%',font:{size:10}},
+          grid:{color:'#f1f5f9'},
+          title:{display:true,text:'Auslastung %',font:{size:10},color:'#64748b'}},
+        x:{ticks:{font:{size:9},maxRotation:40,maxTicksLimit:18}}
+      }
+    }
+  });
+}
+
+function renderAuslastung(){
+  const flagsEl=document.getElementById('al-flags');
+  const out=document.getElementById('auslastung-out');
+  if(!flagsEl||!out)return;
+  const allTypes=_alAllTypes();
+  if(!allTypes.length){
+    flagsEl.innerHTML='';
+    out.innerHTML='<p style="color:#94a3b8;padding:24px;font-size:13px">Zuerst <strong>Stammdaten → Gerüsttypen</strong> oder <strong>Schalungstypen</strong> anlegen.</p>';
+    return;
+  }
+  // sync display-unit buttons
+  const du=window._alDispUnit||'m2';
+  {const ac='#475569',ic='#fff';
+   const bM2=document.getElementById('al-du-m2'),bEu=document.getElementById('al-du-euro'),bBt=document.getElementById('al-du-both');
+   if(bM2){bM2.style.background=du==='m2'?ac:ic;bM2.style.color=du==='m2'?ic:ac;}
+   if(bEu){bEu.style.background=du==='euro'?ac:ic;bEu.style.color=du==='euro'?ic:ac;}
+   if(bBt){bBt.style.background=du==='beide'?ac:ic;bBt.style.color=du==='beide'?ic:ac;}}
+  const showM2=du==='m2'||du==='beide';
+  const showEuro=du==='euro'||du==='beide';
+  flagsEl.innerHTML=allTypes.map(t=>{
+    const key=_alKey(t);const on=_alIsOn(key);
+    const isMiete=(t.besitz||'eigentum')==='miete';
+    return `<button onclick="toggleAlFlag('${key}')" style="padding:5px 14px;border-radius:20px;border:2px solid ${t.color};background:${on?t.color:'transparent'};color:${on?'#fff':t.color};cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap">
+      ${t.icon} ${esc(t.name)} <span style="opacity:.8">${t.menge.toLocaleString('de-AT')} m²${isMiete?' 🔑':''}</span></button>`;
+  }).join('');
+  const activeTypes=allTypes.filter(t=>_alIsOn(_alKey(t)));
+  if(!activeTypes.length){
+    if(window._alChart){window._alChart.destroy();window._alChart=null;}
+    const alWrap=document.getElementById('al-chart-wrap');if(alWrap)alWrap.style.display='none';
+    out.innerHTML='<p style="color:#94a3b8;padding:20px;font-size:13px">Kein Typ ausgewählt.</p>';return;
+  }
+  const units=_alGetUnits();
+  const todayKey=_alTodayKey();
+  const isWeek=(window._alViewMode||'month')==='week';
+  const projekte=(S.proj||[]).filter(p=>(p.status||'auftrag')!=='abgeschlossen').sort((a,b)=>(a.start||'')>(b.start||'')?1:-1);
+  const lastHdr=showM2&&showEuro?'Max m² / €':showEuro?'Kosten €':'Max m²';
+  let tbl=`<table style="border-collapse:collapse;font-size:12px;min-width:100%"><thead><tr>`;
+  tbl+=`<th style="padding:6px 10px;text-align:left;background:#f1f5f9;border:1px solid #e2e8f0;position:sticky;left:0;z-index:2;min-width:170px">Projekt</th>`;
+  units.forEach(u=>{
+    const isCur=u===todayKey;
+    tbl+=`<th style="padding:3px 2px;text-align:center;background:${isCur?'#dbeafe':'#f1f5f9'};border:1px solid #e2e8f0;min-width:${isWeek?44:52}px;font-size:10px;font-weight:${isCur?700:500}">${_alUnitLabel(u)}</th>`;
+  });
+  tbl+=`<th style="padding:4px 8px;background:#f1f5f9;border:1px solid #e2e8f0;min-width:90px">${lastHdr}</th></tr></thead><tbody>`;
+  activeTypes.forEach(typ=>{
+    const kap=typ.menge;
+    const isMiete=(typ.besitz||'eigentum')==='miete';
+    const wp=typ.wochenpreis||0;
+    const totals_m2={};const totals_euro={};
+    units.forEach(u=>{
+      totals_m2[u]=projekte.reduce((s,p)=>s+_alDisplayVal(_alFindEntry(p.id,typ.kat,typ.id),u),0);
+      totals_euro[u]=projekte.reduce((s,p)=>s+_alEuroVal(_alFindEntry(p.id,typ.kat,typ.id),u,typ),0);
+    });
+    const maxTotal=Math.max(0,...Object.values(totals_m2));
+    const maxPct=kap?Math.round(maxTotal/kap*100):0;
+    const hdrCol=maxPct>100?'#dc2626':maxPct>80?'#d97706':'#065f46';
+    // type header row
+    tbl+=`<tr style="background:${typ.bg}"><td colspan="${units.length+2}" style="padding:6px 10px;border:1px solid #e2e8f0;position:sticky;left:0;z-index:1;background:${typ.bg}">
+      <span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-weight:700;color:${typ.color};font-size:13px">${typ.icon} ${esc(typ.name)}</span>
+        ${isMiete?`<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${typ.color}22;color:${typ.color}">🔑 Miete${wp?' · '+wp.toLocaleString('de-AT',{minimumFractionDigits:2})+' €/m²/Wo':''}</span>`:''}
+        <span style="font-size:11px;color:#475569">Kapazität: ${kap.toLocaleString('de-AT')} m²</span>
+        <span style="font-size:11px;font-weight:700;color:${hdrCol}">Max. Auslastung: ${maxPct}%</span>
+        <button onclick="openAlPlanModal(null,'${typ.kat}',${typ.id})" style="font-size:10px;padding:2px 8px;background:transparent;border:1.5px solid ${typ.color};border-radius:12px;color:${typ.color};cursor:pointer;font-family:inherit">+ Projekt planen</button>
+      </span></td></tr>`;
+    // totals row
+    tbl+=`<tr style="background:#f8faff"><td style="padding:4px 10px;border:1px solid #e2e8f0;font-size:11px;font-weight:700;color:#475569;position:sticky;left:0;background:#f8faff;z-index:1">Gesamt / Auslastung</td>`;
+    units.forEach(u=>{
+      const v=totals_m2[u];const ev=totals_euro[u];const isCur=u===todayKey;
+      const pct=kap?Math.round(v/kap*100):0;
+      const bg=v>kap?'#fee2e2':v>kap*0.8?'#fef9c3':v>0?'#f0fdf4':'#f8faff';
+      const col=v>kap?'#dc2626':v>kap*0.8?'#d97706':'#16a34a';
+      const over=v>kap?v-kap:0;
+      tbl+=`<td style="padding:3px 2px;border:1px solid #e2e8f0;text-align:center;background:${bg};${isCur?'border-left:2px solid #3b82f6;':''}">`;
+      if(showM2){
+        if(v){tbl+=`<div style="font-size:10px;font-weight:700">${v.toLocaleString('de-AT')}</div>`
+               +`<div style="font-size:9px;color:${col}">${pct}%</div>`
+               +(over?`<div style="font-size:9px;color:#dc2626;font-weight:700">(+${over.toLocaleString('de-AT')})</div>`:'');}
+        else{tbl+=`<span style="color:#e2e8f0;font-size:10px">–</span>`;}
+      }
+      if(showEuro&&wp){
+        if(ev)tbl+=`<div style="font-size:9px;color:${typ.color};font-weight:700">${ev.toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0})} €</div>`;
+        else if(!showM2)tbl+=`<span style="color:#e2e8f0;font-size:10px">–</span>`;
+      }else if(showEuro&&!showM2&&!wp){tbl+=`<span style="color:#e2e8f0;font-size:10px">–</span>`;}
+      tbl+=`</td>`;
+    });
+    const totalEuro=isMiete?Object.values(totals_euro).reduce((a,b)=>a+b,0):0;
+    tbl+=`<td style="border:1px solid #e2e8f0;padding:4px 6px;font-size:11px;color:#64748b;text-align:right">`;
+    if(showM2)tbl+=`${kap.toLocaleString('de-AT')} m²`;
+    if(showEuro&&wp)tbl+=`${showM2?'<br>':''}${totalEuro.toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0})} €`;
+    tbl+=`</td></tr>`;
+    // project rows
+    projekte.forEach(p=>{
+      const entry=_alFindEntry(p.id,typ.kat,typ.id);
+      const vals_m2=units.map(u=>_alDisplayVal(entry,u));
+      const vals_euro=units.map(u=>_alEuroVal(entry,u,typ));
+      const maxVal=Math.max(0,...vals_m2);
+      const hasData=maxVal>0;
+      const maxPctP=kap?Math.round(maxVal/kap*100):0;
+      const pCol=maxPctP>100?'#dc2626':maxPctP>80?'#d97706':maxPctP>0?'#16a34a':'#94a3b8';
+      const rowBg=hasData?'#fff':'#fafafa';
+      tbl+=`<tr style="background:${rowBg}"><td style="padding:3px 8px;border:1px solid #e2e8f0;position:sticky;left:0;background:${rowBg};z-index:1">
+        <span class="bdg" style="font-size:10px;background:${hasData?typ.bg:'#f1f5f9'};border:1px solid ${hasData?typ.color:'#e2e8f0'};color:${hasData?typ.color:'#94a3b8'};border-radius:20px;padding:2px 8px;cursor:pointer;white-space:nowrap;display:inline-block" onclick="openAlPlanModal(${p.id},'${typ.kat}',${typ.id})">
+          ${typ.icon} ${esc(p.name)}${p.ort?` <span style="opacity:.6">· ${esc(p.ort)}</span>`:''}
+        </span></td>`;
+      units.forEach((u,i)=>{
+        const v=vals_m2[i];const ev=vals_euro[i];const isCur=u===todayKey;
+        const ppct=kap?v/kap:0;
+        const bg=v?(ppct>1?'#fee2e2':ppct>0.5?'#fef9c3':'#f0fdf4'):'';
+        const isDerived=entry&&(_alGetVal(entry,u)>0)&&(!(u.includes('-W')?entry.wochen&&entry.wochen[u]:entry.monate&&entry.monate[u]));
+        tbl+=`<td style="padding:2px 1px;border:1px solid #e2e8f0;text-align:center;cursor:pointer;${bg?'background:'+bg+';':''}${isCur?'border-left:2px solid #3b82f6;':''}" onclick="alEditCell(${p.id},'${typ.kat}',${typ.id},'${u}',${v},event)">`;
+        if(showM2){
+          tbl+=v?`<div style="font-size:10px;${isDerived?'opacity:.5;font-style:italic':''}">${v.toLocaleString('de-AT')}</div>`:`<span style="color:#e8ecf0;font-size:10px">·</span>`;
+        }
+        if(showEuro&&wp){
+          if(ev)tbl+=`<div style="font-size:9px;color:${typ.color}">${ev.toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0})} €</div>`;
+          else if(!showM2)tbl+=`<span style="color:#e8ecf0;font-size:10px">·</span>`;
+        }
+        tbl+=`</td>`;
+      });
+      const maxEuro=wp?Math.max(0,...vals_euro):0;
+      tbl+=`<td style="padding:3px 6px;border:1px solid #e2e8f0;text-align:right;font-size:10px;white-space:nowrap">`;
+      if(!showM2&&!showEuro)tbl+=`<span style="color:#cbd5e1">–</span>`;
+      else{
+        if(showM2){tbl+=maxVal?`<span style="font-weight:700;color:${pCol}">${maxVal.toLocaleString('de-AT')} m²</span><br><span style="color:#94a3b8;font-size:9px">${maxPctP}%</span>`:`<span style="color:#cbd5e1">–</span>`;}
+        if(showEuro&&wp&&maxEuro)tbl+=`${showM2&&maxVal?'<br>':''}<span style="color:${typ.color};font-weight:600">${maxEuro.toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0})} €</span>`;
+        else if(showEuro&&!showM2&&(!wp||!maxEuro))tbl+=`<span style="color:#cbd5e1">–</span>`;
+      }
+      tbl+=`</td></tr>`;
+    });
+    tbl+=`<tr><td colspan="${units.length+2}" style="padding:3px;border:none;background:#f8faff"></td></tr>`;
+  });
+  tbl+=`</tbody></table>`;
+  out.innerHTML=tbl;
+  renderAuslastungChart();}
+
+// ════════════════════════════════════════════════════════
+// AUSLASTUNG — Inline cell edit
+// ════════════════════════════════════════════════════════
+function alEditCell(projId,kat,typId,key,cur,ev){
+  const td=(ev&&ev.currentTarget)||event.currentTarget;
+  const inp=document.createElement('input');
+  inp.type='number';inp.min='0';inp.value=cur||'';
+  inp.style='width:46px;font-size:11px;text-align:center;border:1.5px solid #3b82f6;border-radius:3px;padding:2px;outline:none';
+  td.innerHTML='';td.appendChild(inp);inp.focus();inp.select();
+  let saved=false;
+  function commit(){
+    if(saved)return;saved=true;
+    const num=Math.max(0,parseFloat(inp.value)||0);
+    const entry=_alEnsureEntry(projId,kat,typId);
+    _alSetVal(entry,key,num);
+    saveState();renderAuslastung();
+  }
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){saved=true;renderAuslastung();}});
+}
+
+// ════════════════════════════════════════════════════════
+// AUSLASTUNG — Planning modal
+// ════════════════════════════════════════════════════════
+function openAlPlanModal(projId,kat,typId){
+  window._alPlan={projId,kat,typId};
+  // Planning modal ALWAYS uses weeks (KW) regardless of main view mode
+  const today=new Date();
+  const gridUnits=[];
+  const startD=new Date(today);startD.setDate(today.getDate()-28);
+  for(let i=0;i<80;i++){const d=new Date(startD);d.setDate(startD.getDate()+i*7);gridUnits.push(_weekKey(d));}
+  // Title + icon
+  const typ=(kat==='gerust'?S.gerust_typen:S.schalung_typen)||[];
+  const typObj=typ.find(t=>t.id===typId)||{name:kat};
+  const icon=kat==='gerust'?'🏗️':'🧱';
+  // Project picker
+  const pickEl=document.getElementById('alp-proj-pick');
+  if(!projId){
+    pickEl.style.display='';
+    const sel=document.getElementById('alp-proj-sel');
+    const projs=(S.proj||[]).filter(p=>(p.status||'auftrag')!=='abgeschlossen');
+    sel.innerHTML='<option value="">– Projekt wählen –</option>'+projs.map(p=>`<option value="${p.id}">${esc(p.name)}${p.ort?' · '+esc(p.ort):''}</option>`).join('');
+    sel.onchange=()=>{window._alPlan.projId=+sel.value||null;};
+    document.getElementById('alp-title').textContent=`${icon} ${esc(typObj.name)} – Projekt wählen`;
+  }else{
+    pickEl.style.display='none';
+    const proj=(S.proj||[]).find(p=>p.id===projId);
+    document.getElementById('alp-title').textContent=`${icon} ${esc(typObj.name)} · ${proj?esc(proj.name):'?'}`;
+  }
+  // Entry + bedarf
+  const entry=projId?_alFindEntry(projId,kat,typId):null;
+  // Pre-fill bedarf: from entry if set, else from project Gesamtbedarf field
+  const proj4bedarf=projId?(S.proj||[]).find(p=>p.id===projId):null;
+  const projBedarf=proj4bedarf?(kat==='gerust'?(proj4bedarf.gerust_m2||0):((proj4bedarf.mauerschal_m2||0)+(proj4bedarf.deckenschal_m2||0))):0;
+  document.getElementById('alp-bedarf-inp').value=entry?.bedarf||projBedarf||'';
+  // Von/Bis selects (always KW)
+  const vonSel=document.getElementById('alp-von');
+  const bisSel=document.getElementById('alp-bis');
+  const opts=gridUnits.map(u=>{const[yr,wk]=u.split('-W');const d=_weekKeyDate(u);const mo=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][d.getMonth()];return `<option value="${u}">KW ${+wk} · ${mo} ${yr.slice(2)}</option>`;}).join('');
+  vonSel.innerHTML=opts;bisSel.innerHTML=opts;
+  // Default von/bis from project start/end
+  if(projId){
+    const proj=(S.proj||[]).find(p=>p.id===projId);
+    if(proj&&proj.start){
+      const wm=proj.start.match(/^(\d+)-W(\d+)$/);
+      if(wm){
+        const vKey=`${+wm[1]}-W${String(+wm[2]).padStart(2,'0')}`;
+        if(Array.from(vonSel.options).some(o=>o.value===vKey))vonSel.value=vKey;
+      }
+    }
+    if(proj&&proj.start&&proj.dauer){
+      const wm=proj.start.match(/^(\d+)-W(\d+)$/);
+      if(wm){
+        const startD2=_weekKeyDate(`${+wm[1]}-W${String(+wm[2]).padStart(2,'0')}`);
+        const endD=new Date(startD2);endD.setDate(startD2.getDate()+proj.dauer*7);
+        const bKey=_weekKey(endD);
+        if(Array.from(bisSel.options).some(o=>o.value===bKey))bisSel.value=bKey;
+      }
+    }
+  }
+  // Show/hide delete button
+  const delBtn=document.getElementById('alp-del-btn');
+  if(delBtn)delBtn.style.display=entry?'':'none';
+  // Build KW grid
+  const grid=document.getElementById('alp-grid');
+  const moNames=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  // Group weeks by month — build HTML with month separators
+  let gridHtml='';let lastMo='';
+  gridUnits.forEach(u=>{
+    const[yr,wk]=u.split('-W');const d=_weekKeyDate(u);
+    const moKey=`${d.getFullYear()}-${d.getMonth()}`;
+    const moLabel=moNames[d.getMonth()]+' '+yr;
+    const isCur=u===_weekKey(new Date());
+    if(moKey!==lastMo){
+      if(lastMo!=='')gridHtml+='</div>';
+      gridHtml+=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:#1e3a5c;background:#f1f5f9;padding:3px 6px;border-radius:4px;margin-top:6px">${moLabel}</div>`;
+      gridHtml+='<div style="display:contents">';
+      lastMo=moKey;
+    }
+    gridHtml+=`<div>
+      <label style="font-size:10px;color:${isCur?'#1d4ed8':'#64748b'};font-weight:${isCur?700:400};display:block;margin-bottom:2px">KW ${+wk}</label>
+      <input type="number" min="0" id="alp-${u}" value="${(_alGetVal(entry,u))||''}" placeholder="0"
+        style="width:100%;padding:4px 3px;border:1.5px solid ${isCur?'#93c5fd':'#cbd5e1'};border-radius:5px;font-size:11px;box-sizing:border-box"
+        oninput="_alpUpdateSum()">
+    </div>`;
+  });
+  if(lastMo!=='')gridHtml+='</div>';
+  grid.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:4px;margin-top:4px">${gridHtml}</div>`;
+  document.getElementById('alp-undo-btn').style.display='none';
+  window._alpUndo=null;
+  _alpUpdateSum();
+  _alpHighlightRange();
+  document.getElementById('modal-alplan').classList.add('open');
+}
+
+function alpDelete(){
+  const{projId,kat,typId}=window._alPlan||{};
+  if(!projId)return;
+  if(!confirm('Alle Planungsdaten für dieses Projekt/Ausrüstung löschen?'))return;
+  S.auslastung=(S.auslastung||[]).filter(a=>!(a.projId===projId&&a.typId===typId&&(a.kat===kat||(kat==='schalung'&&(a.kat==='mauerschalung'||a.kat==='deckenschalung')))));
+  saveState();closeAlPlanModal();renderAuslastung();
+  showToast('🗑 Planung gelöscht');
+}
+function closeAlPlanModal(){document.getElementById('modal-alplan').classList.remove('open');}
+
+function _alpUpdateSum(){
+  const grid=document.getElementById('alp-grid');if(!grid)return;
+  let sum=0;grid.querySelectorAll('input[type=number]').forEach(i=>{sum+=parseFloat(i.value)||0;});
+  const bedarf=parseFloat(document.getElementById('alp-bedarf-inp')?.value)||window._alPlan?.bedarf||0;
+  const pct=bedarf?Math.round(sum/bedarf*100):null;
+  const col=pct===null?'#94a3b8':pct>100?'#dc2626':pct===100?'#16a34a':'#d97706';
+  document.getElementById('alp-sum').textContent=sum.toLocaleString('de-AT');
+  const pctEl=document.getElementById('alp-pct');
+  if(pctEl)pctEl.innerHTML=pct!==null?`<span style="color:${col};font-weight:700">${pct}% von ${bedarf.toLocaleString('de-AT')} m²</span>`:'';
+}
+function alpVerteilen(){
+  const von=document.getElementById('alp-von').value;
+  const bis=document.getElementById('alp-bis').value;
+  const menge=parseFloat(document.getElementById('alp-menge').value)||0;
+  if(!menge)return showToast('⚠️ Menge eingeben');
+  if(von>bis)return showToast('⚠️ Von > Bis');
+  const grid=document.getElementById('alp-grid');
+  const hits=[];
+  grid.querySelectorAll('input[type=number]').forEach(inp=>{
+    const k=inp.id.replace('alp-','');
+    if(k>=von&&k<=bis)hits.push(inp);
+  });
+  if(!hits.length)return showToast('⚠️ Keine Perioden im Bereich');
+  window._alpUndo=Array.from(grid.querySelectorAll('input[type=number]')).map(i=>({id:i.id,v:i.value}));
+  document.getElementById('alp-undo-btn').style.display='';
+  hits.forEach(inp=>{inp.value=menge;});
+  _alpUpdateSum();
+}
+function alpUndo(){
+  if(!window._alpUndo)return;
+  window._alpUndo.forEach(({id,v})=>{const el=document.getElementById(id);if(el)el.value=v;});
+  window._alpUndo=null;
+  document.getElementById('alp-undo-btn').style.display='none';
+  _alpUpdateSum();
+}
+function _alpHighlightRange(){
+  const von=document.getElementById('alp-von')?.value;
+  const bis=document.getElementById('alp-bis')?.value;
+  const grid=document.getElementById('alp-grid');if(!grid)return;
+  grid.querySelectorAll('input[type=number]').forEach(inp=>{
+    const k=inp.id.replace('alp-','');
+    const inRange=von&&bis&&k>=von&&k<=bis;
+    inp.style.borderColor=inRange?'#3b82f6':'#cbd5e1';
+    inp.style.background=inRange?'#eff6ff':'';
+  });
+}
+function _alpKwInput(field){
+  const raw=document.getElementById('alp-kw-'+field).value.trim();
+  if(!raw)return;
+  const cleaned=raw.replace(/[kKwW\s]/g,'');
+  const parts=cleaned.split(/[\/\-]/);
+  let kw=parseInt(parts[0]);
+  let yr=parts[1]?parseInt(parts[1]):null;
+  if(!yr||yr<100)yr=(yr?2000+yr:new Date().getFullYear());
+  if(isNaN(kw)||kw<1||kw>53)return showToast('⚠️ Ungültige KW');
+  // Modal always uses weeks
+  const key=`${yr}-W${String(kw).padStart(2,'0')}`;
+  const sel=document.getElementById('alp-'+field);
+  if(sel&&Array.from(sel.options).some(o=>o.value===key)){
+    sel.value=key;_alpHighlightRange();
+  }else{showToast('⚠️ KW '+kw+'/'+yr+' nicht im Bereich');}
+}
+function alpSave(){
+  const {kat,typId}=window._alPlan||{};
+  let {projId}=window._alPlan||{};
+  if(!projId){
+    const sel=document.getElementById('alp-proj-sel');
+    projId=sel?+sel.value:0;
+  }
+  if(!projId)return showToast('⚠️ Projekt auswählen');
+  const bedarfVal=Math.max(0,parseFloat(document.getElementById('alp-bedarf-inp')?.value)||0);
+  const entry=_alEnsureEntry(projId,kat,typId);
+  entry.bedarf=bedarfVal;
+  document.getElementById('alp-grid').querySelectorAll('input[type=number]').forEach(inp=>{
+    const key=inp.id.replace('alp-','');
+    const v=parseFloat(inp.value)||0;
+    _alSetVal(entry,key,v);
+  });
+  saveState();
+  closeAlPlanModal();
+  renderAuslastung();
+  showToast('✅ Planung gespeichert');
+}
+
+// ════════════════════════════════════════════════════════
+// Hook into renderAll + saveProject
+// ════════════════════════════════════════════════════════
+// renderAll extended directly in block 1
+// saveProject: Gesamtbedarf stored via project fields
+
+// ════════════════════════════════════════════════════════
+// DIGITAL CONSTRUCTION — Qualitätsprüfung Ausführungsprojekt
+// ════════════════════════════════════════════════════════
+
+const DC_DATA = [
+  {block:'I',blockTitle:'Verfügbarkeit der Unterlagen',sections:[
+    {id:'A',title:'A · Projektdokumentation & Formate',sub:'Elenco elaborati, Dateiformate & BIM-Modell',color:'#1d4ed8',items:[
+      {id:'A.1',t:'A.1 · Elenco elaborati – vollständig & geprüft',d:'Planverzeichnis liegt vor, ist vollständig und auf aktuellem Revisionsstand.'},
+      {id:'A.2',t:'A.2 · Allgemeiner Projektbericht (aktuell)',d:'Relazione generale di progetto liegt vor und ist aktuell.'},
+      {id:'A.3',t:'A.3 · Grafische Unterlagen – Format PDF & DWG',d:'Alle Planunterlagen als PDF vorhanden. DWG-Dateien ebenfalls verfügbar.'},
+      {id:'A.4',t:'A.4 · BIM-Modell / IFC-Datei – Verfügbarkeit & Disziplinen',d:'BIM-Modell vorhanden? Format: IFC, natives Format (Revit, Archicad)? Koordinationsmodell zusammengeführt?'},
+    ]},
+    {id:'B',title:'B · Genehmigungen & Behörden',sub:'Permesso di costruire, Behördenauflagen & Genehmigungen',color:'#7c3aed',items:[
+      {id:'B.1',t:'B.1 · Genehmigungspläne 1:100 (Baugenehmigung / PDC)',d:'Abgleich mit dem Ausführungsprojekt – keine wesentlichen Abweichungen.'},
+      {id:'B.2',t:'B.2 · Baugenehmigung inkl. Auflagen',d:'Baugenehmigungsbescheid liegt vor. Alle behördlichen Auflagen geprüft.'},
+      {id:'B.3',t:'B.3 · Genehmigungen zuständiger Behörden',d:'Forstbehörde, Gartenamt, Nachbarn, Gemeinde, Denkmalschutz – je nach Projektsituation.'},
+      {id:'B.4',t:'B.4 · Stellungnahme Feuerwehr (VVF)',d:'Parere/Nulla osta dei VV.F. vorhanden oder beantragt (falls erforderlich).'},
+      {id:'B.5',t:'B.5 · Nulla osta Sanitätsamt (ASL / AULSS)',d:'Sanitäre Freigabe vorhanden, sofern für die Nutzungsart erforderlich.'},
+      {id:'B.6',t:'B.6 · CAM-Konformitätsnachweis (falls erforderlich)',d:'Attestazione di conformità ai CAM vorhanden, soweit gesetzlich vorgeschrieben.'},
+    ]},
+    {id:'C',title:'C · Urbanistik, Risiken & Erschließung',sub:'Urbanistik, Gefahrenzonen & Erschließung Baufeld',color:'#b45309',items:[
+      {id:'C.1',t:'C.1 · Geländeaufnahme & Bestandsaufnahme',d:'Lage- und Höhenaufnahme des Grundstücks vorhanden.'},
+      {id:'C.2',t:'C.2 · Auszug Durchführungsplan (D.P. / P.d.A.) mit Normen',d:'Auszug mit geltenden Normen liegt vor und ist mit dem AP abgeglichen.'},
+      {id:'C.3',t:'C.3 · Normen Gemeindebauleitplan (G.B.P. / P.U.C.)',d:'Relevante GBP-/PUC-Normen identifiziert und auf Einhaltung geprüft.'},
+      {id:'C.4',t:'C.4 · Prüfung Gefahrenzonen',d:'Grundwasserstand, Rutschgefahr, Steinschlag, Überschwemmung. Altlasten abgeklärt.'},
+      {id:'C.5',t:'C.5 · Prüfung Zufahrt & Baustellenlogistik',d:'Zufahrtsmöglichkeiten definiert. Lastbeschränkungen, Wendebereiche, Lagerplätze geprüft.'},
+    ]},
+    {id:'D',title:'D · Fachberichte & Sonderprojekte',sub:'Fachberichte, Sonderprojekte & Zertifizierungen',color:'#0d9488',items:[
+      {id:'D.1',t:'D.1 · Infrastrukturplan inkl. Anschlussprojekte',d:'Vollständiger Infrastrukturplan: Kanal, Wasser, Strom, Gas, Telekommunikation.'},
+      {id:'D.2',t:'D.2 · Projekt Barrierefreiheit',d:'Projekt zur Beseitigung von Architekturbarrieren liegt vor.'},
+      {id:'D.3',t:'D.3 · Ausführungsprojekt Brandschutz (VVF / esecutivo)',d:'Brandschutzprojekt liegt vor. Alle Anforderungen im AP eingearbeitet.'},
+      {id:'D.4',t:'D.4 · PV-Anlage Projekt (falls vorgesehen)',d:'PV-Projekt vorhanden: Anlagenleistung, Modulanordnung, Wechselrichter definiert.'},
+      {id:'D.5',t:'D.5 · KlimaHaus-Projekt & Berechnung',d:'KlimaHaus-Nachweis vorhanden. Angestrebte Klasse definiert.'},
+      {id:'D.6',t:'D.6 · Schallschutzbericht (Relazione acustica)',d:'Akustischer Bericht vorhanden. Anforderungen je Bauteil definiert.'},
+      {id:'D.7',t:'D.7 · Beleuchtungstechn. Bericht & Berechnung',d:'Beleuchtungsplanung vorhanden. Beleuchtungsstärken berechnet.'},
+      {id:'D.8',t:'D.8 · R.I.E.-Projekt & Berechnung (falls vorgesehen)',d:'Projekt und Berechnung der Reti Idriche Esterne vorhanden.'},
+      {id:'D.9',t:'D.9 · Wartungsplan des Bauwerks (Piano di manutenzione)',d:'Piano di manutenzione vom Planer erstellt (gesetzliche Pflicht).'},
+      {id:'D.10',t:'D.10 · Technische Akte des Bauwerks (Fascicolo tecnico)',d:'Fascicolo tecnico vom Planer erstellt (gesetzliche Pflicht, D.Lgs. 81/2008).'},
+    ]},
+    {id:'E',title:'E · Vertrag, Kosten & Sicherheit',sub:'Vertrag, Kostenplan, Sicherheit & Terminprogramm',color:'#dc2626',items:[
+      {id:'E.1',t:'E.1 · Besonderes Leistungsverzeichnis (Capitolato speciale)',d:'Technische Anforderungen, Materialspezifikationen für alle Gewerke definiert.'},
+      {id:'E.2',t:'E.2 · Kostenermittlung / Massenberechnung (Computo metrico)',d:'Mengen plausibel und konsistent mit den Ausführungsplänen.'},
+      {id:'E.3',t:'E.3 · Schätzung Sicherheitskosten (Stima costi sicurezza)',d:'Gesondert ausgewiesen (D.Lgs. 81/2008). Nicht verhandelbar.'},
+      {id:'E.4',t:'E.4 · Bauzeitplan (Cronoprogramma lavori)',d:'Phasen, Meilensteine und kritische Abhängigkeiten eingetragen.'},
+      {id:'E.5',t:'E.5 · Sicherheits- und Gesundheitsschutzplan (PSC / SiGePlan)',d:'PSC vollständig ausgearbeitet, vom Koordinator (CSP) unterzeichnet.'},
+      {id:'E.6',t:'E.6 · Projekt Absturzsicherung & Provisorien',d:'Temporäre Sicherungsmaßnahmen vorhanden, sofern erforderlich.'},
+    ]},
+  ]},
+  {block:'II',blockTitle:'Qualitätsprüfung des Ausführungsprojekts',sections:[
+    {id:'1',title:'1 · Rohbau & Konstruktion',sub:'Konstruktive Vollständigkeit, Maße, Bewehrung & Schalmasse',color:'#1e40af',items:[
+      {id:'1.1',t:'1.1 · Vollständigkeit der Grundrisse',d:'Alle Geschosse vorhanden (UG, EG, OG, DG), Sonderebenen vollständig.'},
+      {id:'1.2',t:'1.2 · Maßketten & Bemaßung',d:'Konstruktive und architektonische Maßketten vollständig eingetragen.'},
+      {id:'1.3',t:'1.3 · Öffnungen, Aussparungen & Durchbrüche',d:'Alle Türen, Fenster, TGA-Durchführungen mit Mindestmaßen.'},
+      {id:'1.4',t:'1.4 · Wandstärken & Materialien',d:'Alle Wände mit Stärken und Materialangabe. Legende vorhanden.'},
+      {id:'1.5',t:'1.5 · Deckenaufbauten & Stärken',d:'Deckendicken je Geschoss eingetragen. Sonderbereiche definiert.'},
+      {id:'1.6',t:'1.6 · Höhenkoten & Geschosshöhen',d:'ROK, FOK, FUK und Fertigfußboden-Höhen definiert.'},
+      {id:'1.7',t:'1.7 · Schnitte (Längs- & Querschnitte)',d:'Mind. 2 Längsschnitte und 1 Querschnitt mit Höhenkoten.'},
+      {id:'1.8',t:'1.8 · Treppenhäuser & Aufzugsschächte',d:'Treppenkonstruktion, Stufenmaße, Handlaufangaben. Aufzugsgrube definiert.'},
+      {id:'1.9',t:'1.9 · Dehnungsfugen & Konstruktionsfugen',d:'Lage und Ausbildung eingetragen. Fugendetails vorhanden.'},
+      {id:'1.10',t:'1.10 · Kellerbereich & Abdichtungskonzept (UG)',d:'Abdichtungsart und -lage im UG definiert.'},
+      {id:'1.11',t:'1.11 · Dachkonstruktion (Grundriss & Schnitt)',d:'Dachaufbau, Sparren-/Pfettenmaße, Gefälle eingetragen.'},
+      {id:'1.12',t:'1.12 · Details für kritische Konstruktionspunkte',d:'Detailzeichnungen für Balkone, Attikas, Kelleranschluss. Min. M 1:10.'},
+      {id:'1.13',t:'1.13 · Rohbauöffnung & architektonisches Maß',d:'Rohbauöffnung und fertige architektonische Öffnung klar angegeben.'},
+      {id:'1.14',t:'1.14 · Schalmaße für Wände & Decken',d:'Bemaßung explizit als Rohbaumaß angegeben (für Polier, Zimmerei).'},
+      {id:'1.15',t:'1.15 · Konsistenz Pläne ↔ Abachi (Türen, Wände, Böden)',d:'Türen-, Wand- und Bodenabachi vorhanden und konsistent.'},
+    ]},
+    {id:'2',title:'2 · Haustechnik & TGA',sub:'Sanitär, Heizung, Lüftung, Elektro & Koordinationsplanung',color:'#0891b2',items:[
+      {id:'2.1',t:'2.1 · Schachtpositionen & Schachtgrößen',d:'Alle Steig- und Installationsschächte positioniert und bemaßt.'},
+      {id:'2.2',t:'2.2 · Leitungsführung Sanitär koordiniert',d:'Fallleitungen, Grundleitungen, Wasserversorgung definiert.'},
+      {id:'2.3',t:'2.3 · Heizung & Lüftung (Trassen & Querschnitte)',d:'Lüftungskanäle mit Trasse eingetragen. Raumhöhen prüfbar.'},
+      {id:'2.4',t:'2.4 · Elektro & Schwachstrom (Trassen)',d:'Elektrosteigleitungen, Verteilerstandorte, Unterverteilungen eingetragen.'},
+      {id:'2.5',t:'2.5 · Einbauten (Wannen, Duschen, Nischen)',d:'Sanitäreinbauten mit Anschlussmaßen eingetragen.'},
+      {id:'2.6',t:'2.6 · Technikräume dimensioniert & zugänglich',d:'Heizraum, UVB-Raum, Lüftungszentrale ausreichend dimensioniert.'},
+      {id:'2.7',t:'2.7 · Brandabschnitte & TGA-Durchbrüche',d:'Brandschutzabschnitte eingetragen. Durchbrüche definiert.'},
+      {id:'2.8',t:'2.8 · Installationswände & -ebenen definiert',d:'Installationswände in Nasszellen und Küchen eingetragen.'},
+    ]},
+    {id:'3',title:'3 · Ausbau & Fassade',sub:'Bodenbeläge, Wände, Decken, Türen, Fenster & Fassade',color:'#059669',items:[
+      {id:'3.1',t:'3.1 · Bodenaufbauten & Estrichdicken',d:'Aufbauten je Raum definiert (Trittschalldämmung, Estrich, Belag).'},
+      {id:'3.2',t:'3.2 · Wandverkleidungen & Putzdicken',d:'Innenputzdicken je Wandtyp angegeben.'},
+      {id:'3.3',t:'3.3 · Fassadenaufbau & Dämmung',d:'Fassadensystem definiert. Dämmstärken je Wandseite eingetragen.'},
+      {id:'3.4',t:'3.4 · Abdichtungsebenen (Balkone, Terrassen, Feuchträume)',d:'Abdichtungsart und Lage eingetragen. Gefälle erkennbar.'},
+      {id:'3.5',t:'3.5 · Entwässerungskonzept (Gefälle, Abläufe, Rinnen)',d:'Flächengefälle eingetragen (min. 1,5 %). Ablaufpositionen definiert.'},
+      {id:'3.6',t:'3.6 · Fenster- & Türanschlüsse (Leibung, Sturz, Schwelle)',d:'Fenster- und Türdetails vorhanden. Barrierefreiheit geprüft.'},
+      {id:'3.7',t:'3.7 · Sockelbereich & Außenanschluss',d:'Sockeldetail vorhanden (Abdichtung, Dämmung, Entwässerung).'},
+      {id:'3.8',t:'3.8 · Außenanlagen & Erschließung',d:'Wege, Parkierung, Bepflanzung, Einfriedung grob definiert.'},
+      {id:'3.9',t:'3.9 · Deckenverkleidungen & abgehängte Decken',d:'Abgehängte Decken mit Unterkantenhöhe eingetragen.'},
+    ]},
+    {id:'4',title:'4 · Schnittstellen',sub:'Statik, Bauphysik, Akustik, Brandschutz & Schnittstellenabstimmung',color:'#7c3aed',items:[
+      {id:'4.1',t:'4.1 · Konsistenz Architektur ↔ Statik (Träger, Stützen, Unterzüge)',d:'Tragende Elemente aus Statik im AP eingetragen.'},
+      {id:'4.2',t:'4.2 · Fundamentplan vorhanden & abgestimmt',d:'Fundamentplan des Statikers liegt vor und ist mit Architektur abgestimmt.'},
+      {id:'4.3',t:'4.3 · Lastannahmen für Sonderkonstruktionen',d:'Besondere Lasten klar definiert. Freigabe durch Statiker dokumentiert.'},
+      {id:'4.4',t:'4.4 · Bauphysik: U-Werte & Wandaufbauten definiert',d:'Alle Außenbauteile mit U-Wert-Angabe. Konsistent mit Energieausweis.'},
+      {id:'4.5',t:'4.5 · Wärmebrückendetails (kritische Punkte)',d:'Balkonplatte, Attika, Fensterleibung mit Detailzeichnungen.'},
+      {id:'4.6',t:'4.6 · Akustik: Trennwände & Decken klassifiziert',d:'Schallschutzanforderungen je Raumnutzung eingetragen.'},
+      {id:'4.7',t:'4.7 · Brandschutzkonzept erkennbar & konsistent',d:'Brandabschnitte, Flucht- und Rettungswege im AP eingetragen.'},
+      {id:'4.8',t:'4.8 · Planstände abgestimmt & aktuell',d:'Alle Fachplaner-Pläne auf gleichem Revisionsstand.'},
+      {id:'4.9',t:'4.9 · BIM-Modell vorhanden & aktuell (falls vereinbart)',d:'IFC-Modell vorhanden. Koordinationsmodell zusammengeführt.'},
+      {id:'4.10',t:'4.10 · Bewehrungspläne & Eisenliste vorhanden',d:'Schal- und Bewehrungszeichnungen vorhanden. Eisenliste für AV und Einkauf.'},
+    ]},
+  ]},
+];
+
+const DC_STATUS_CFG = {
+  gruen:       {label:'✅ OK',        bg:'#dcfce7',border:'#16a34a',color:'#15803d'},
+  gelb:        {label:'⚠️ Teilw.',    bg:'#fef9c3',border:'#ca8a04',color:'#a16207'},
+  rot:         {label:'⛔ Fehlt',     bg:'#fee2e2',border:'#dc2626',color:'#b91c1c'},
+  zu_pruefen:  {label:'🔍 Prüfen',   bg:'#ede9fe',border:'#7c3aed',color:'#6d28d9'},
+  nicht_notw:  {label:'➖ N/A',       bg:'#f1f5f9',border:'#94a3b8',color:'#64748b'},
+};
+
+function _dcEnsure(projId){
+  if(!S.dc)S.dc={};
+  if(!S.dc[projId])S.dc[projId]={items:{},version:'',pruefVon:'',pruefDatum:''};
+  return S.dc[projId];
+}
+function _dcGetItem(projId,critId){
+  _dcEnsure(projId);
+  return S.dc[projId].items[critId]||{status:null,note:''};
+}
+function _dcSetStatus(projId,critId,status){
+  _dcEnsure(projId);
+  if(!S.dc[projId].items[critId])S.dc[projId].items[critId]={status:null,note:''};
+  S.dc[projId].items[critId].status=status;
+  saveState();
+  _dcUpdateSectionProgress(projId,critId);
+  _dcUpdateOverallProgress(projId);
+}
+function _dcSetNote(projId,critId,note){
+  _dcEnsure(projId);
+  if(!S.dc[projId].items[critId])S.dc[projId].items[critId]={status:null,note:''};
+  S.dc[projId].items[critId].note=note;
+  saveState();
+}
+function _dcProgress(projId){
+  const allItems=DC_DATA.flatMap(b=>b.sections.flatMap(s=>s.items));
+  let done=0,total=0;
+  allItems.forEach(it=>{
+    const st=_dcGetItem(projId,it.id).status;
+    if(st==='nicht_notw')return;
+    total++;
+    if(st==='gruen')done++;
+  });
+  return{done,total,pct:total?Math.round(done/total*100):0};
+}
+function _dcSectionProgress(projId,sectionId){
+  const sec=DC_DATA.flatMap(b=>b.sections).find(s=>s.id===sectionId);
+  if(!sec)return{done:0,total:0,pct:0};
+  let done=0,total=0;
+  sec.items.forEach(it=>{
+    const st=_dcGetItem(projId,it.id).status;
+    if(st==='nicht_notw')return;
+    total++;
+    if(st==='gruen')done++;
+  });
+  return{done,total,pct:total?Math.round(done/total*100):0};
+}
+function _dcUpdateSectionProgress(projId,critId){
+  // find section
+  const secId=critId.split('.')[0];
+  const pr=_dcSectionProgress(projId,secId);
+  const el=document.getElementById(`dc-sec-prog-${secId}`);
+  if(el){
+    el.style.width=pr.pct+'%';
+    el.title=`${pr.done}/${pr.total}`;
+  }
+  const lbl=document.getElementById(`dc-sec-count-${secId}`);
+  if(lbl)lbl.textContent=`${pr.done}/${pr.total}`;
+}
+function _dcUpdateOverallProgress(projId){
+  const pr=_dcProgress(projId);
+  const el=document.getElementById('dc-overall-bar');
+  if(el)el.style.width=pr.pct+'%';
+  const lbl=document.getElementById('dc-overall-lbl');
+  if(lbl)lbl.textContent=`${pr.pct}% · ${pr.done}/${pr.total} OK`;
+}
+
+function _dcAllItems(){return DC_DATA.flatMap(b=>b.sections.flatMap(s=>s.items));}
+function _dcStatusCounts(projId){
+  const items=_dcAllItems();
+  let ok=0,fehlt=0,teilw=0,pruefen=0,na=0,none=0;
+  items.forEach(it=>{
+    const st=_dcGetItem(projId,it.id).status;
+    if(st==='gruen')ok++;
+    else if(st==='rot')fehlt++;
+    else if(st==='gelb')teilw++;
+    else if(st==='zu_pruefen')pruefen++;
+    else if(st==='nicht_notw')na++;
+    else none++;
+  });
+  const total=items.length;
+  const eff=total-na;
+  return{ok,fehlt,teilw,pruefen,na,none,total,eff,pct:eff>0?Math.round(ok/eff*100):0};
+}
+function _dcSectionCounts(projId,secId){
+  const sec=DC_DATA.flatMap(b=>b.sections).find(s=>s.id===secId);
+  if(!sec)return{ok:0,eff:0,pct:0};
+  let ok=0,na=0;
+  sec.items.forEach(it=>{
+    const st=_dcGetItem(projId,it.id).status;
+    if(st==='gruen')ok++;
+    if(st==='nicht_notw')na++;
+  });
+  const eff=sec.items.length-na;
+  return{ok,eff,pct:eff>0?Math.round(ok/eff*100):0};
+}
+
+// ================================================================
+// AUTH & PERMISSIONS (BLOCK 2 additions)
+// ================================================================
+let _cu=null; // current user object
+
+function _renderLoginPicker(){
+  const sel=document.getElementById('login-user-sel');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— Benutzer wählen —</option>'+
+    (S.users||[]).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('');
+}
+
+function _afterLoginSetup(uid){
+  const user=(S.users||[]).find(u=>u.id===uid);
+  _cu=user||null;
+  if(!user)return;
+  const nameEl=document.getElementById('hdr-user-name');
+  const logoutEl=document.getElementById('hdr-logout-btn');
+  const adminTab=document.getElementById('tab-admin');
+  if(nameEl){nameEl.textContent='👤 '+user.name;nameEl.style.display='';}
+  if(logoutEl)logoutEl.style.display='';
+  if(adminTab)adminTab.style.display=user.isAdmin?'':'none';
+  _applyTabVis();
+  // Bootstrap: if no admin exists yet, offer current user to become admin
+  const hasAdmin=(S.users||[]).some(u=>u.isAdmin);
+  if(!hasAdmin){
+    setTimeout(()=>{
+      if(confirm('⚙️ Ersteinrichtung\n\nEs wurde noch kein Administrator festgelegt.\n\nMöchten Sie "'+user.name+'" als Administrator einrichten?')){
+        user.isAdmin=true;
+        if(adminTab)adminTab.style.display='';
+        saveState();
+        showToast('✅ '+user.name+' ist jetzt Administrator');
+      }
+    },500);
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem('bau_logged');
+  sessionStorage.removeItem('bau_user_id');
+  _cu=null;
+  const nameEl=document.getElementById('hdr-user-name');
+  const logoutEl=document.getElementById('hdr-logout-btn');
+  const adminTab=document.getElementById('tab-admin');
+  if(nameEl)nameEl.style.display='none';
+  if(logoutEl)logoutEl.style.display='none';
+  if(adminTab)adminTab.style.display='none';
+  _renderLoginPicker();
+  document.getElementById('login-overlay').style.display='flex';
+  document.getElementById('login-form').style.display='block';
+  document.getElementById('login-loading').style.display='none';
+}
+
+function _getPerm(tab){
+  if(!_cu)return'none';
+  if(_cu.isAdmin)return'write';
+  const perms=(S.permissions||{})[_cu.id]||{};
+  return perms[tab]||'none';
+}
+function _isRO(tab){return _getPerm(tab)==='read';}
+
+function _applyTabVis(){
+  const tabs=['proj','gantt','avcheck','archiv','stamm','auslastung','dc'];
+  tabs.forEach(t=>{
+    const el=document.querySelector(`[onclick="switchMainTab('${t}')"]`);
+    if(!el)return;
+    const perm=_getPerm(t);
+    el.style.display=perm==='none'?'none':'';
+  });
+  // if current active tab is now hidden, switch to first accessible
+  const active=document.querySelector('.tab.active');
+  if(active&&active.style.display==='none'){
+    const first=tabs.find(t=>_getPerm(t)!=='none');
+    if(first)switchMainTab(first);
+  }
+}
+
+// ── Admin panel ──────────────────────────────────────────────────
+const _ADMIN_TABS=[
+  {id:'proj',label:'Projekte'},
+  {id:'gantt',label:'Gantt'},
+  {id:'avcheck',label:'Arbeitsvorb.'},
+  {id:'auslastung',label:'Auslastung'},
+  {id:'dc',label:'Digital Const.'},
+  {id:'archiv',label:'Archiv'},
+  {id:'stamm',label:'Stammdaten'},
+];
+
+function renderAdminPanel(){
+  if(!_cu||!_cu.isAdmin){document.getElementById('admin-content').innerHTML='<p style="color:#dc2626">Kein Zugriff.</p>';return;}
+  const users=S.users||[];
+  const c=document.getElementById('admin-content');
+  let out='';
+
+  // ── Section: Users ──
+  out+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:18px;font-weight:800;color:#0f172a">⚙️ Administration</div>
+  </div>`;
+
+  out+=`<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:20px;overflow:hidden">
+    <div style="padding:14px 18px;border-bottom:1px solid #f1f5f9;font-weight:700;font-size:14px;color:#0f172a">👥 Benutzerverwaltung</div>
+    <div style="padding:14px 18px">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:2px solid #e2e8f0">
+        <th style="text-align:left;padding:6px 8px;color:#64748b;font-size:11px;text-transform:uppercase">Name</th>
+        <th style="text-align:center;padding:6px 8px;color:#64748b;font-size:11px;text-transform:uppercase">PIN</th>
+        <th style="text-align:center;padding:6px 8px;color:#64748b;font-size:11px;text-transform:uppercase">Admin</th>
+        <th style="padding:6px 8px"></th>
+      </tr></thead>
+      <tbody>
+        ${users.map(u=>`<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:8px;font-weight:600">${esc(u.name)}</td>
+          <td style="padding:8px;text-align:center">
+            <div style="display:flex;gap:4px;justify-content:center;align-items:center">
+              <input type="password" id="apin-${u.id}" inputmode="numeric" maxlength="8" placeholder="Neuer PIN" style="width:100px;padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;text-align:center;letter-spacing:4px">
+              <button onclick="_adminSavePin(${u.id})" style="padding:4px 10px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">✓ Setzen</button>
+              ${u.pin||u.pw?'<span style="font-size:11px;color:#16a34a">✅ gesetzt</span>':'<span style="font-size:11px;color:#dc2626">⚠️ kein PIN</span>'}
+            </div>
+          </td>
+          <td style="padding:8px;text-align:center">
+            <button onclick="_adminToggleAdmin(${u.id})" style="padding:4px 10px;border:1.5px solid ${u.isAdmin?'#7c3aed':'#e2e8f0'};border-radius:6px;background:${u.isAdmin?'#ede9fe':'#f8fafc'};color:${u.isAdmin?'#7c3aed':'#94a3b8'};cursor:pointer;font-size:12px;font-family:inherit;font-weight:${u.isAdmin?700:400}">${u.isAdmin?'✓ Admin':'Kein Admin'}</button>
+          </td>
+          <td style="padding:8px;text-align:right">
+            ${u.id===_cu.id?'':'<button onclick="_adminDelUser('+u.id+')" style="padding:3px 8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer;font-size:11px;font-family:inherit">🗑</button>'}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div style="margin-top:14px;border-top:1px solid #f1f5f9;padding-top:14px">
+      <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Neuer Benutzer</div>
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+        <div><label class="lbl">Name</label><input class="inp" id="adm-u-name" placeholder="Max Muster" style="width:140px"></div>
+        <div><label class="lbl">PIN</label><input type="password" inputmode="numeric" maxlength="8" class="inp" id="adm-u-pin" placeholder="••••" style="width:100px;letter-spacing:4px;text-align:center"></div>
+        <button class="btn bg" onclick="_adminAddUser()" style="align-self:end">+ Hinzufügen</button>
+      </div>
+    </div>
+    </div>
+  </div>`;
+
+  // ── Section: Permissions matrix ──
+  out+=`<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden">
+    <div style="padding:14px 18px;border-bottom:1px solid #f1f5f9;font-weight:700;font-size:14px;color:#0f172a">🔐 Zugriffsrechte pro Reiter</div>
+    <div style="padding:14px 18px;overflow-x:auto">
+    <table class="perm-matrix">
+      <thead><tr>
+        <th style="text-align:left;min-width:120px">Benutzer</th>
+        ${_ADMIN_TABS.map(t=>`<th>${t.label}</th>`).join('')}
+      </tr></thead>
+      <tbody>
+        ${users.map(u=>{
+          if(u.isAdmin)return`<tr><td style="padding:8px 10px;font-weight:600">${esc(u.name)}</td>${_ADMIN_TABS.map(()=>`<td style="text-align:center;color:#7c3aed;font-size:12px;font-weight:700">Admin</td>`).join('')}</tr>`;
+          return`<tr><td style="padding:8px 10px;font-weight:600">${esc(u.name)}</td>${_ADMIN_TABS.map(t=>{
+            const cur=(S.permissions[u.id]||{})[t.id]||'none';
+            return`<td><select class="perm-select" onchange="_adminSetPerm(${u.id},'${t.id}',this.value)">
+              <option value="none" ${cur==='none'?'selected':''}>— Kein</option>
+              <option value="read" ${cur==='read'?'selected':''}>👁 Lesen</option>
+              <option value="write" ${cur==='write'?'selected':''}>✏️ Schreiben</option>
+            </select></td>`;
+          }).join('')}</tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <p style="margin:10px 0 0;font-size:11px;color:#94a3b8">Änderungen werden sofort gespeichert. Benutzer müssen sich neu anmelden, damit neue Rechte wirksam werden.</p>
+    </div>
+  </div>`;
+
+  c.innerHTML=out;
+}
+
+function _adminSavePin(uid){
+  const inp=document.getElementById('apin-'+uid);
+  if(!inp)return;
+  const pin=inp.value.trim();
+  if(!pin){showToast('⚠️ PIN eingeben');return;}
+  if(pin.length<4){showToast('⚠️ PIN muss mindestens 4 Zeichen haben');return;}
+  const u=S.users.find(x=>x.id===uid);
+  if(!u)return;
+  u.pin=pin;
+  delete u.pw; // replace old pw field
+  inp.value='';
+  saveState();showToast('✅ PIN für '+u.name+' gesetzt');
+  renderAdminPanel();
+}
+
+function _adminToggleAdmin(uid){
+  const u=S.users.find(x=>x.id===uid);
+  if(!u)return;
+  if(u.id===_cu.id){showToast('⚠️ Eigenen Admin-Status nicht änderbar');return;}
+  u.isAdmin=!u.isAdmin;
+  if(u.isAdmin){
+    // Admin gets write on all tabs (remove from permissions)
+    delete (S.permissions||{})[uid];
+  }
+  saveState();renderAdminPanel();
+}
+
+function _adminSetPerm(uid,tab,val){
+  if(!S.permissions)S.permissions={};
+  if(!S.permissions[uid])S.permissions[uid]={};
+  S.permissions[uid][tab]=val;
+  saveState();
+}
+
+function _adminAddUser(){
+  const name=document.getElementById('adm-u-name').value.trim();
+  const pin=document.getElementById('adm-u-pin').value.trim();
+  if(!name||!pin){showToast('⚠️ Name und PIN eingeben');return;}
+  if(pin.length<4){showToast('⚠️ PIN muss mindestens 4 Zeichen haben');return;}
+  S.users.push({id:S.ids.user++,name,pin,isAdmin:false});
+  document.getElementById('adm-u-name').value='';
+  document.getElementById('adm-u-pin').value='';
+  saveState();renderAdminPanel();showToast('✅ Benutzer hinzugefügt');
+}
+
+function _adminDelUser(uid){
+  const u=S.users.find(x=>x.id===uid);
+  if(!u)return;
+  if(!confirm('Benutzer "'+u.name+'" wirklich löschen?'))return;
+  S.users=S.users.filter(x=>x.id!==uid);
+  delete (S.permissions||{})[uid];
+  saveState();renderAdminPanel();showToast('🗑️ Benutzer gelöscht');
+}
+
+
+function renderDC(){
+  const dash=document.getElementById('dc-dashboard');
+  const grid=document.getElementById('dc-projects-grid');
+  if(!dash||!grid)return;
+  dash.style.display='';
+  document.getElementById('dc-detail').style.display='none';
+  const auftraege=(S.proj||[]).filter(p=>(p.status||'auftrag')==='auftrag');
+  auftraege.forEach(p=>_dcEnsure(p.id));
+  // stats
+  let totalOk=0,totalFehlt=0,totalOpen=0;
+  auftraege.forEach(p=>{const c=_dcStatusCounts(p.id);totalOk+=c.ok;totalFehlt+=c.fehlt;totalOpen+=c.teilw+c.pruefen+c.none;});
+  const stEl=id=>document.getElementById(id);
+  if(stEl('dc-stat-total'))stEl('dc-stat-total').textContent=auftraege.length;
+  if(stEl('dc-stat-ok'))stEl('dc-stat-ok').textContent=totalOk;
+  if(stEl('dc-stat-open'))stEl('dc-stat-open').textContent=totalOpen;
+  if(stEl('dc-stat-fehlt'))stEl('dc-stat-fehlt').textContent=totalFehlt;
+  if(!auftraege.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="eico">🏗️</div><p>Keine aktiven Aufträge vorhanden.</p></div>`;
+    return;
+  }
+  try{
+  grid.innerHTML=auftraege.map(p=>{
+    const c=_dcStatusCounts(p.id);
+    const pct=c.pct;
+    const hdrCol=pct>=100?'linear-gradient(135deg,#065f46,#0d9488)':pct>0?'linear-gradient(135deg,#0f5040,#0f766e)':'linear-gradient(135deg,#1a3a5c,#2563eb)';
+    const plBadges=(p.pl||[]).map(a=>`👷 ${plName(a.id)}`).join(', ')||'';
+    const sectionRows=DC_DATA.flatMap(b=>b.sections).map(s=>{
+      const sc=_dcSectionCounts(p.id,s.id);
+      const fillCol=sc.pct>=100?'pgreen':sc.pct>0?'pyellow':'pred';
+      const shortTitle=s.title.split('·')[1]?.trim()||s.title;
+      return`<div class="progress-row"><span class="plabel">${esc(shortTitle)}</span><div class="progress-bar"><div class="progress-fill ${fillCol}" style="width:${sc.pct}%"></div></div><span class="pct">${sc.pct}%</span></div>`;
+    }).join('');
+    return`<div class="av-project-card" onclick="openDCProject(${p.id})">
+      <div class="av-card-hdr" style="background:${hdrCol}"><h3>${esc(p.name)}</h3><div class="meta">📍 ${esc(p.ort||'')}${plBadges?' · '+esc(plBadges):''}</div></div>
+      <div class="av-card-body">
+        <div class="progress-row" style="margin-bottom:12px"><span class="plabel" style="font-weight:700;color:#0f766e">Gesamt</span><div class="progress-bar" style="height:10px"><div class="progress-fill pgreen" style="width:${pct}%"></div></div><span class="pct" style="font-weight:700;color:#0f766e">${pct}%</span></div>
+        ${sectionRows}
+      </div>
+      <div class="av-card-footer">
+        <span style="font-size:11px;color:var(--gray);flex:1">✅${c.ok} ⚠️${c.teilw} ⛔${c.fehlt} 🔍${c.pruefen}</span>
+        <button class="btn bp btn-sm" onclick="event.stopPropagation();openDCProject(${p.id})">Öffnen →</button>
+      </div>
+    </div>`;
+  }).join('');
+  }catch(e){grid.innerHTML='<div style="padding:20px;color:#dc2626">⚠️ Fehler beim Rendern: '+e.message+'</div>';console.error('renderDC error:',e);}
+}
+
+function closeDCDetail(){
+  document.getElementById('dc-dashboard').style.display='';
+  document.getElementById('dc-detail').style.display='none';
+  renderDC();
+}
+
+function openDCProject(projId){
+  window._dcProjId=projId;
+  const proj=(S.proj||[]).find(p=>p.id===projId);
+  if(!proj)return;
+  _dcEnsure(projId);
+  document.getElementById('dc-dashboard').style.display='none';
+  const detail=document.getElementById('dc-detail');
+  detail.style.display='';
+  document.getElementById('dc-detail-title').textContent=`${proj.name}${proj.ort?' · '+proj.ort:''}`;
+  const content=document.getElementById('dc-content');
+  if(!content)return;
+  const overallPr=_dcProgress(projId);
+  let out='';
+  // Header card
+  out+=`<div style="background:#fff;border-radius:10px;padding:14px 20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#0f766e">🏗️ ${esc(proj.name)}</div>${proj.ort?`<div style="font-size:11px;color:#64748b">📍 ${esc(proj.ort)}</div>`:''}</div>
+      <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:${overallPr.pct>=100?'#16a34a':'#0f766e'}">${overallPr.pct}% abgeschlossen</div><div style="font-size:11px;color:#64748b">${overallPr.done}/${overallPr.total} Kriterien OK</div></div>
+    </div>
+    <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div id="dc-overall-bar" style="height:100%;background:#0d9488;border-radius:4px;transition:width .4s;width:${overallPr.pct}%"></div></div>
+    <div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap">
+      <label style="font-size:11px;color:#64748b">AP-Version: <input onchange="S.dc[${projId}].version=this.value;saveState()" value="${esc(S.dc[projId].version||'')}" style="border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:11px;font-family:inherit" placeholder="z.B. Rev. 3"></label>
+      <label style="font-size:11px;color:#64748b">Geprüft von: <input onchange="S.dc[${projId}].pruefVon=this.value;saveState()" value="${esc(S.dc[projId].pruefVon||'')}" style="border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:11px;font-family:inherit" placeholder="Name Techniker"></label>
+      <label style="font-size:11px;color:#64748b">Datum: <input type="date" onchange="S.dc[${projId}].pruefDatum=this.value;saveState()" value="${S.dc[projId].pruefDatum||''}" style="border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:11px;font-family:inherit"></label>
+    </div>
+  </div>`;
+  // Sections
+  DC_DATA.forEach(block=>{
+    out+=`<div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.5px;text-transform:uppercase;padding:10px 0 4px;margin-top:4px">${esc(block.blockTitle)}</div>`;
+    block.sections.forEach(sec=>{
+      const sp=_dcSectionProgress(projId,sec.id);
+      out+=`<div style="background:#fff;border-radius:10px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">
+        <div style="padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,${sec.color}15,#fff)">
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:${sec.color}">${esc(sec.title)}</div><div style="font-size:10px;color:#64748b;margin-top:1px">${esc(sec.sub)}</div></div>
+          <span style="font-size:11px;color:#64748b;white-space:nowrap" id="dc-sec-count-${sec.id}">${sp.done}/${sp.total}</span>
+          <div style="width:70px;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden"><div id="dc-sec-prog-${sec.id}" style="height:100%;background:${sec.color};border-radius:3px;width:${sp.pct}%"></div></div>
+        </div>`;
+      sec.items.forEach(it=>{
+        const item=_dcGetItem(projId,it.id);
+        const st=item.status;
+        const cfg=st?DC_STATUS_CFG[st]:null;
+        out+=`<div style="padding:10px 14px;border-bottom:1px solid #f8faff;${cfg?'background:'+cfg.bg+';':''}">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:#1e293b;line-height:1.4">${esc(it.t)}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.4">${esc(it.d)}</div>
+              <textarea onchange="_dcSetNote(${projId},'${it.id}',this.value)" placeholder="Anmerkung …" style="margin-top:5px;width:100%;font-size:11px;border:1px solid #e2e8f0;border-radius:4px;padding:3px 6px;resize:none;height:30px;font-family:inherit;color:#334155;background:#fff">${esc(item.note||'')}</textarea>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:3px;max-width:220px;justify-content:flex-end">
+              ${Object.entries(DC_STATUS_CFG).map(([k,v])=>`<button onclick="_dcSetStatus(${projId},'${it.id}','${k}')" style="padding:3px 8px;border:1.5px solid ${st===k?v.border:'#e2e8f0'};border-radius:5px;background:${st===k?v.bg:'#fff'};color:${st===k?v.color:'#94a3b8'};cursor:pointer;font-size:11px;font-weight:${st===k?'700':'400'};font-family:inherit;white-space:nowrap">${v.label}</button>`).join('')}
+            </div>
+          </div>
+        </div>`;
+      });
+      out+='</div>';
+    });
+  });
+  content.innerHTML=out;
+}
+
+</script>
+
 </body>
 </html>
