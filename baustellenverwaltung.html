@@ -1260,7 +1260,7 @@ async function jbLoad(){
     const r=await fetch(FB_URL);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
-    if(d&&d.proj!==undefined&&(d.proj.length||d.pl.length||d.bk.length||d.va.length)){
+    if(d&&typeof d==='object'){
       _applyData(d);showToast('☁️ Daten aktualisiert');
     }
     _jbStatus('ok');
