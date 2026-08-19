@@ -1205,7 +1205,7 @@ const SECTIONS=[
 // ================================================================
 // LANGUAGE
 // ================================================================
-let lang = localStorage.getItem('bauLang') || 'de';
+var lang = localStorage.getItem('bauLang') || 'de';
 const T = {
   de:{s0:'❌ Offen',s1:'🟡 Laufend',s2:'✅ Erledigt',s3:'⬜ Entfällt',spDone:'Erledigt',spWip:'Laufend',spOpen:'Offen',spNa:'Entfällt',colDesc:'Beschreibung',colStatus:'Status',colResp:'Verantwortlich',colDue:'Fälligkeit',colNotes:'Notizen',respPh:'Person',notesPh:'Notizen...'},
   it:{s0:'❌ Aperto',s1:'🟡 In corso',s2:'✅ Completato',s3:'⬜ Non appl.',spDone:'Completato',spWip:'In corso',spOpen:'Aperto',spNa:'Non appl.',colDesc:'Descrizione',colStatus:'Stato',colResp:'Responsabile',colDue:'Scadenza',colNotes:'Note',respPh:'Persona',notesPh:'Note...'}
@@ -1229,9 +1229,9 @@ function toggleLang(){
 // ================================================================
 // STATE
 // ================================================================
-const S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],gerust_typen:[],schalung_typen:[],auslastung:[],dc:{},permissions:{},ids:{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1},editing:null,sdedit:{type:null,id:null}};
+var S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],gerust_typen:[],schalung_typen:[],auslastung:[],dc:{},permissions:{},ids:{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1},editing:null,sdedit:{type:null,id:null}};
 let rowCtr=0;
-const APP_KEY='bauapp_v2';
+var APP_KEY='bauapp_v2';
 
 // ================================================================
 // CLOUD SYNC — Firebase Realtime Database
@@ -1257,14 +1257,26 @@ function _jbPush(){
 async function jbLoad(){
   _jbStatus('loading');
   try{
-    const r=await fetch(FB_URL);
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),8000);
+    const r=await fetch(FB_URL,{signal:ctrl.signal});
+    clearTimeout(timer);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     if(d&&typeof d==='object'){
       _applyData(d);showToast('☁️ Daten aktualisiert');
     }
     _jbStatus('ok');
-  }catch(e){_jbStatus('offline');showToast('⚠️ Cloud nicht erreichbar ('+e.message+')');}
+  }catch(e){
+    _jbStatus('offline');
+    const msg=e.name==='AbortError'?'Timeout – Server nicht erreichbar':e.message;
+    showToast('⚠️ Cloud: '+msg);
+    // Bei Timeout: Retry-Möglichkeit anzeigen falls noch kein Login
+    if(S.users.length===0){
+      const ldg=document.getElementById('login-loading');
+      if(ldg)ldg.innerHTML='⚠️ Verbindung fehlgeschlagen. <button onclick="jbLoad()" style="margin-left:8px;padding:6px 16px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">🔄 Erneut versuchen</button>';
+    }
+  }
   checkLoginRequired();
 }
 
@@ -1279,9 +1291,14 @@ function clearAllData(){
   localStorage.removeItem(APP_KEY);location.reload();
 }
 function _applyData(d){
-  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];S.users=d.users||[];S.kranPlan=d.kranPlan||[];S.gerust_typen=d.gerust_typen||[];S.schalung_typen=d.schalung_typen||[];S.auslastung=d.auslastung||[];S.dc=d.dc||{};S.permissions=d.permissions||{};S.ids=d.ids||{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1};
+  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];
+  S.kranPlan=d.kranPlan||[];S.gerust_typen=d.gerust_typen||[];S.schalung_typen=d.schalung_typen||[];S.auslastung=d.auslastung||[];
+  if(d.users&&d.users.length)S.users=d.users;
+  if(d.permissions&&Object.keys(d.permissions).length)S.permissions=d.permissions;
+  S.dc=(d.dc&&!Array.isArray(d.dc))?d.dc:{};
+  S.ids=d.ids||S.ids||{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1};
   localStorage.setItem(APP_KEY,_statePayload());
-  renderAll();
+  try{renderAll();}catch(e){console.error('renderAll:',e);}
 }
 function _fsConnected(name){
   const ind=document.getElementById('fs-indicator');
@@ -2443,7 +2460,12 @@ function checkLoginRequired(){
   const ov=document.getElementById('login-overlay');
   const frm=document.getElementById('login-form');
   const ldg=document.getElementById('login-loading');
-  if(S.users.length===0){ov.style.display='none';return;}
+  if(S.users.length===0){
+    // Keine Benutzer → App ohne Login öffnen (Ersteinrichtung)
+    ov.style.display='none';
+    showToast('ℹ️ Bitte Benutzer im Admin-Bereich anlegen');
+    return;
+  }
   const _uidStr=sessionStorage.getItem('bau_user_id');
   const stillValid=(_uidStr!==null)&&S.users.find(u=>String(u.id)===_uidStr);
   if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){
@@ -2588,26 +2610,7 @@ function delKranPlan(id){
 }
 function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv();if(typeof renderGerustTypen==='function')renderGerustTypen();if(typeof renderSchalungTypen==='function')renderSchalungTypen();if(typeof renderAuslastung==='function')renderAuslastung();
         if(typeof renderDC==='function')renderDC();}
-// Login-Overlay sofort zeigen während Daten laden
-(function(){
-  const ov=document.getElementById('login-overlay');
-  // Aus localStorage laden um Benutzerliste sofort zu kennen
-  try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}}catch(e){}
-  const _startUidStr=sessionStorage.getItem('bau_user_id');
-  const uid=_startUidStr!==null?+_startUidStr:null;
-  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_startUidStr!==null&&S.users.find(u=>String(u.id)===_startUidStr)){
-    // Restore session immediately from localStorage
-    ov.style.display='none';
-    setTimeout(()=>_afterLoginSetup(S.users.find(u=>String(u.id)===_startUidStr).id),0);
-  } else if(S.users.length>0){
-    _renderLoginPicker();
-    document.getElementById('login-form').style.display='block';
-    document.getElementById('login-loading').style.display='none';
-  }
-  // else: keep overlay visible with loading spinner until jbLoad completes
-})();
-renderAll();
-jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
+// Startup wird nach Script-Block 2 ausgeführt (siehe unten)
 </script>
 <div class="overlay" id="modal-kranplan" onclick="if(event.target===this)closeKranPlanModal()">
   <div style="background:#fff;border-radius:12px;padding:24px;width:400px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2);margin-top:60px">
@@ -3975,6 +3978,46 @@ function openDCProject(projId){
   content.innerHTML=out;
 }
 
+</script>
+
+<script>
+// Startup: läuft nach ALLEN Funktionsdefinitionen
+(function(){
+  const ov=document.getElementById('login-overlay');
+  try{
+    let raw=localStorage.getItem(APP_KEY);
+    if(!raw)raw=localStorage.getItem('bauapp_v2_dev');
+    if(raw){const d=JSON.parse(raw);if(d.users&&d.users.length)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}
+  }catch(e){}
+  const _startUidStr=sessionStorage.getItem('bau_user_id');
+  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_startUidStr!==null&&S.users.find(u=>String(u.id)===_startUidStr)){
+    ov.style.display='none';
+    const foundUser=S.users.find(u=>String(u.id)===_startUidStr);
+    setTimeout(()=>_afterLoginSetup(foundUser.id),0);
+  } else if(S.users.length>0){
+    _renderLoginPicker();
+    document.getElementById('login-form').style.display='block';
+    document.getElementById('login-loading').style.display='none';
+  }
+})();
+try{renderAll();}catch(e){console.error('startup renderAll:',e);}
+jbLoad();
+// Harter Fallback: Nach 10s Login erzwingen falls noch loading
+setTimeout(function(){
+  const ldg=document.getElementById('login-loading');
+  const frm=document.getElementById('login-form');
+  const ov=document.getElementById('login-overlay');
+  if(ov&&ov.style.display!=='none'&&ldg&&ldg.style.display!=='none'){
+    // Noch auf loading → Login erzwingen oder App öffnen
+    if(S.users&&S.users.length>0){
+      try{_renderLoginPicker();}catch(e){}
+      if(frm)frm.style.display='block';
+      if(ldg)ldg.style.display='none';
+    } else {
+      if(ov)ov.style.display='none';
+    }
+  }
+},10000);
 </script>
 
 </body>
