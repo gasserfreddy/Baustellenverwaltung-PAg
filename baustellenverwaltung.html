@@ -1251,7 +1251,7 @@ function _jbPush(){
     _jbStatus('saving');
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),10000);
-    fetch(FB_URL,{method:'PUT',body:_statePayload(),signal:ctrl.signal})
+    fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload(),signal:ctrl.signal})
       .then(r=>{clearTimeout(t);if(!r.ok)throw new Error('HTTP '+r.status);_jbStatus('ok');showToast('✅ Gespeichert');})
       .catch(e=>{clearTimeout(t);_jbStatus('error');showToast('⚠️ Speichern fehlgeschlagen: '+(e.name==='AbortError'?'Timeout':e.message));});
   },600);
@@ -1288,7 +1288,7 @@ async function jbSync(){
   try{
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),10000);
-    const r=await fetch(FB_URL,{method:'PUT',body:_statePayload(),signal:ctrl.signal});
+    const r=await fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload(),signal:ctrl.signal});
     clearTimeout(t);
     if(!r.ok)throw new Error('HTTP '+r.status);
     _jbStatus('ok');
@@ -1311,21 +1311,33 @@ function clearAllData(){
   if(!confirm('Alle Daten löschen und Beispieldaten wiederherstellen?'))return;
   localStorage.removeItem(APP_KEY);location.reload();
 }
+function _mergeArr(local,remote){
+  // Remote-Einträge als Basis; lokale Einträge die nicht in Remote sind, hinzufügen
+  const ids=new Set((remote||[]).map(x=>String(x.id)));
+  const extra=(local||[]).filter(x=>!ids.has(String(x.id)));
+  return [...(remote||[]),...extra];
+}
 function _applyData(d){
-  // Wenn lokale Daten neuer als Firebase-Daten → nicht überschreiben, stattdessen hochladen
-  if(S.ts && (!d.ts || d.ts < S.ts)){
-    showToast('☁️ Lokale Daten sind aktueller – wird hochgeladen…');
-    _jbPush();
-    return;
-  }
-  S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];
-  S.kranPlan=d.kranPlan||[];S.gerust_typen=d.gerust_typen||[];S.schalung_typen=d.schalung_typen||[];S.auslastung=d.auslastung||[];
+  const hadLocalChanges=S.ts>0&&(!d.ts||d.ts<S.ts);
+  // Immer zusammenführen: Remote-Basis + lokale Einträge die dort fehlen
+  S.pl=_mergeArr(S.pl,d.pl||[]);
+  S.va=_mergeArr(S.va,d.va||[]);
+  S.bk=_mergeArr(S.bk,d.bk||[]);
+  S.proj=_mergeArr(S.proj,d.proj||[]);
+  S.kranPlan=_mergeArr(S.kranPlan,d.kranPlan||[]);
+  S.gerust_typen=_mergeArr(S.gerust_typen,d.gerust_typen||[]);
+  S.schalung_typen=_mergeArr(S.schalung_typen,d.schalung_typen||[]);
+  S.auslastung=_mergeArr(S.auslastung,d.auslastung||[]);
   if(d.users&&d.users.length)S.users=d.users;
   if(d.permissions&&Object.keys(d.permissions).length)S.permissions=d.permissions;
   S.dc=(d.dc&&!Array.isArray(d.dc))?d.dc:{};
-  S.ids=d.ids||S.ids||{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1};
-  S.ts=d.ts||S.ts||0;
+  // IDs: immer das Maximum nehmen damit keine ID-Kollisionen entstehen
+  const ri=d.ids||{};const li=S.ids||{};
+  S.ids={pl:Math.max(ri.pl||1,li.pl||1),va:Math.max(ri.va||1,li.va||1),bk:Math.max(ri.bk||1,li.bk||1),proj:Math.max(ri.proj||1,li.proj||1),user:Math.max(ri.user||1,li.user||1),gt:Math.max(ri.gt||1,li.gt||1),st:Math.max(ri.st||1,li.st||1),al:Math.max(ri.al||1,li.al||1)};
+  S.ts=Math.max(d.ts||0,S.ts||0);
   localStorage.setItem(APP_KEY,_statePayload());
+  // Falls lokale Daten fehlende Einträge hatten → sofort zurück zu Firebase pushen
+  if(hadLocalChanges){_jbPush();}
   try{renderAll();}catch(e){console.error('renderAll:',e);}
 }
 function _fsConnected(name){
@@ -1390,7 +1402,7 @@ function importJSON(){
         _applyData(d);
         // Sofort ohne Debounce in Cloud speichern und Ergebnis anzeigen
         _jbStatus('saving');
-        fetch(FB_URL,{method:'PUT',body:_statePayload()})
+        fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:_statePayload()})
           .then(res=>{
             if(!res.ok)return res.text().then(t=>{throw new Error('HTTP '+res.status+': '+t);});
             _jbStatus('ok');showToast('✅ Daten importiert und in Cloud gespeichert');
