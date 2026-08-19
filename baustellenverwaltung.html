@@ -301,7 +301,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
 <body>
 
 <!-- Login Overlay -->
-<div id="login-overlay" style="display:none">
+<div id="login-overlay" style="display:flex">
   <div id="login-box">
     <div class="login-ico">🏗️</div>
     <h2>Baustellenverwaltung</h2>
@@ -2593,14 +2593,18 @@ function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv(
   const ov=document.getElementById('login-overlay');
   // Aus localStorage laden um Benutzerliste sofort zu kennen
   try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}}catch(e){}
-  const uid=+sessionStorage.getItem('bau_user_id');
-  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_uidStr!==null&&S.users.find(u=>String(u.id)===_uidStr)){
-    // Restore session immediately
-    setTimeout(()=>_afterLoginSetup(uid),0);
+  const _startUidStr=sessionStorage.getItem('bau_user_id');
+  const uid=_startUidStr!==null?+_startUidStr:null;
+  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_startUidStr!==null&&S.users.find(u=>String(u.id)===_startUidStr)){
+    // Restore session immediately from localStorage
+    ov.style.display='none';
+    setTimeout(()=>_afterLoginSetup(S.users.find(u=>String(u.id)===_startUidStr).id),0);
   } else if(S.users.length>0){
     _renderLoginPicker();
-    ov.style.display='flex';
+    document.getElementById('login-form').style.display='block';
+    document.getElementById('login-loading').style.display='none';
   }
+  // else: keep overlay visible with loading spinner until jbLoad completes
 })();
 renderAll();
 jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
