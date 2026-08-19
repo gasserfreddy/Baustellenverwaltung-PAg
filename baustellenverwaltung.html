@@ -1229,7 +1229,7 @@ function toggleLang(){
 // ================================================================
 // STATE
 // ================================================================
-var S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],gerust_typen:[],schalung_typen:[],auslastung:[],dc:{},permissions:{},ids:{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1},editing:null,sdedit:{type:null,id:null}};
+var S={pl:[],va:[],bk:[],proj:[],users:[],kranPlan:[],gerust_typen:[],schalung_typen:[],auslastung:[],dc:{},permissions:{},ids:{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1},editing:null,sdedit:{type:null,id:null},ts:0};
 let rowCtr=0;
 var APP_KEY='bauapp_v2';
 
@@ -1301,8 +1301,9 @@ async function jbSync(){
 }
 
 let _fsHandle=null;
-function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,kranPlan:S.kranPlan||[],gerust_typen:S.gerust_typen||[],schalung_typen:S.schalung_typen||[],auslastung:S.auslastung||[],dc:S.dc||{},permissions:S.permissions||{},ids:S.ids});}
+function _statePayload(){return JSON.stringify({pl:S.pl,va:S.va,bk:S.bk,proj:S.proj,users:S.users,kranPlan:S.kranPlan||[],gerust_typen:S.gerust_typen||[],schalung_typen:S.schalung_typen||[],auslastung:S.auslastung||[],dc:S.dc||{},permissions:S.permissions||{},ids:S.ids,ts:S.ts});}
 function saveState(){
+  S.ts=Date.now();
   try{localStorage.setItem(APP_KEY,_statePayload());}catch(e){}
   _jbPush();
 }
@@ -1311,12 +1312,19 @@ function clearAllData(){
   localStorage.removeItem(APP_KEY);location.reload();
 }
 function _applyData(d){
+  // Wenn lokale Daten neuer als Firebase-Daten → nicht überschreiben, stattdessen hochladen
+  if(S.ts && (!d.ts || d.ts < S.ts)){
+    showToast('☁️ Lokale Daten sind aktueller – wird hochgeladen…');
+    _jbPush();
+    return;
+  }
   S.pl=d.pl||[];S.va=d.va||[];S.bk=d.bk||[];S.proj=d.proj||[];
   S.kranPlan=d.kranPlan||[];S.gerust_typen=d.gerust_typen||[];S.schalung_typen=d.schalung_typen||[];S.auslastung=d.auslastung||[];
   if(d.users&&d.users.length)S.users=d.users;
   if(d.permissions&&Object.keys(d.permissions).length)S.permissions=d.permissions;
   S.dc=(d.dc&&!Array.isArray(d.dc))?d.dc:{};
   S.ids=d.ids||S.ids||{pl:1,va:1,bk:1,proj:1,user:1,gt:1,st:1,al:1};
+  S.ts=d.ts||S.ts||0;
   localStorage.setItem(APP_KEY,_statePayload());
   try{renderAll();}catch(e){console.error('renderAll:',e);}
 }
@@ -4007,7 +4015,7 @@ function openDCProject(projId){
   try{
     let raw=localStorage.getItem(APP_KEY);
     if(!raw)raw=localStorage.getItem('bauapp_v2_dev');
-    if(raw){const d=JSON.parse(raw);if(d.users&&d.users.length)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}
+    if(raw){const d=JSON.parse(raw);if(d.users&&d.users.length)S.users=d.users;if(d.permissions)S.permissions=d.permissions;if(d.ts)S.ts=d.ts;}
   }catch(e){}
   const _startUidStr=sessionStorage.getItem('bau_user_id');
   if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_startUidStr!==null&&S.users.find(u=>String(u.id)===_startUidStr)){
