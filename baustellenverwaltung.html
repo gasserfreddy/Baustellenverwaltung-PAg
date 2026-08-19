@@ -2437,8 +2437,9 @@ function checkLoginRequired(){
   const frm=document.getElementById('login-form');
   const ldg=document.getElementById('login-loading');
   if(S.users.length===0){ov.style.display='none';return;}
-  const uid=+sessionStorage.getItem('bau_user_id');
-  const stillValid=uid&&S.users.find(u=>u.id===uid);
+  const _uidStr=sessionStorage.getItem('bau_user_id');
+  const uid=_uidStr!==null?+_uidStr:null;
+  const stillValid=(_uidStr!==null)&&S.users.find(u=>u.id===uid);
   if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){
     _afterLoginSetup(uid);
     ov.style.display='none';return;
@@ -2451,11 +2452,11 @@ function checkLoginRequired(){
 }
 function doLogin(){
   const sel=document.getElementById('login-user-sel');
-  const uid=+sel.value;
   const pin=document.getElementById('login-pin').value.trim();
   const err=document.getElementById('login-err');
   err.textContent='';
-  if(!uid){err.textContent='⚠️ Bitte Benutzer wählen';return;}
+  if(sel.value===''){err.textContent='⚠️ Bitte Benutzer wählen';return;}
+  const uid=+sel.value;
   if(!pin){err.textContent='⚠️ Bitte PIN eingeben';return;}
   const user=S.users.find(u=>u.id===uid);
   if(!user){err.textContent='❌ Benutzer nicht gefunden';return;}
