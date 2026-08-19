@@ -1217,6 +1217,13 @@ function toggleLang(){
   document.getElementById('btn-lang').textContent=lang==='it'?'🇮🇹 IT':'🇩🇪 DE';
   if(avCurrentProjectId){const p=getPrj(avCurrentProjectId);renderAVMeta(p);renderAVSectionTabs(p);renderAVPanel(p,avActiveSection);}
   else renderAVDashboard();
+  if(typeof renderDC==='function'){
+    const _dcDetail=document.getElementById('dc-detail');
+    if(window._dcProjId&&_dcDetail&&_dcDetail.style.display!=='none'){
+      openDCProject(window._dcProjId);
+    }else{renderDC();}
+  }
+  if(typeof renderAuslastung==='function')renderAuslastung();
 }
 
 // ================================================================
@@ -2438,9 +2445,9 @@ function checkLoginRequired(){
   const ldg=document.getElementById('login-loading');
   if(S.users.length===0){ov.style.display='none';return;}
   const _uidStr=sessionStorage.getItem('bau_user_id');
-  const uid=_uidStr!==null?+_uidStr:null;
-  const stillValid=(_uidStr!==null)&&S.users.find(u=>u.id===uid);
+  const stillValid=(_uidStr!==null)&&S.users.find(u=>String(u.id)===_uidStr);
   if(sessionStorage.getItem('bau_logged')==='1'&&stillValid){
+    const uid=stillValid.id;
     _afterLoginSetup(uid);
     ov.style.display='none';return;
   }
@@ -2456,15 +2463,15 @@ function doLogin(){
   const err=document.getElementById('login-err');
   err.textContent='';
   if(sel.value===''){err.textContent='⚠️ Bitte Benutzer wählen';return;}
-  const uid=+sel.value;
+  const _selVal=sel.value;
+  const user=S.users.find(u=>String(u.id)===_selVal);
   if(!pin){err.textContent='⚠️ Bitte PIN eingeben';return;}
-  const user=S.users.find(u=>u.id===uid);
   if(!user){err.textContent='❌ Benutzer nicht gefunden';return;}
   const stored=user.pin||user.pw||'';
   if(!stored){err.textContent='⚠️ Kein PIN gesetzt – bitte Admin kontaktieren';return;}
   if(stored!==pin){err.textContent='❌ Falscher PIN';document.getElementById('login-pin').value='';document.getElementById('login-pin').focus();return;}
   sessionStorage.setItem('bau_logged','1');
-  sessionStorage.setItem('bau_user_id',uid);
+  sessionStorage.setItem('bau_user_id',String(user.id));
   document.getElementById('login-overlay').style.display='none';
   err.textContent='';
   _afterLoginSetup(uid);
@@ -2587,7 +2594,7 @@ function renderAll(){renderPL();renderVA();renderBK();renderProj();renderArchiv(
   // Aus localStorage laden um Benutzerliste sofort zu kennen
   try{const raw=localStorage.getItem(APP_KEY);if(raw){const d=JSON.parse(raw);if(d.users)S.users=d.users;if(d.permissions)S.permissions=d.permissions;}}catch(e){}
   const uid=+sessionStorage.getItem('bau_user_id');
-  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&uid&&S.users.find(u=>u.id===uid)){
+  if(S.users.length>0&&sessionStorage.getItem('bau_logged')==='1'&&_uidStr!==null&&S.users.find(u=>String(u.id)===_uidStr)){
     // Restore session immediately
     setTimeout(()=>_afterLoginSetup(uid),0);
   } else if(S.users.length>0){
@@ -3634,7 +3641,7 @@ function _renderLoginPicker(){
 }
 
 function _afterLoginSetup(uid){
-  const user=(S.users||[]).find(u=>u.id===uid);
+  const user=(S.users||[]).find(u=>String(u.id)===String(uid));
   _cu=user||null;
   if(!user)return;
   const nameEl=document.getElementById('hdr-user-name');
@@ -3898,6 +3905,7 @@ function renderDC(){
 }
 
 function closeDCDetail(){
+  window._dcProjId=null;
   document.getElementById('dc-dashboard').style.display='';
   document.getElementById('dc-detail').style.display='none';
   renderDC();
