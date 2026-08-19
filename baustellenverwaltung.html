@@ -627,7 +627,7 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <!-- AV Project Detail -->
   <div id="av-detail" style="display:none">
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px">
-      <button class="btn bg" onclick="avBackToDashboard()">← Übersicht</button>
+      <button class="btn bg" onclick="avBackToDashboard()">${lang==='it'?'← Panoramica':'← Übersicht'}</button>
       <button class="btn bp" onclick="saveState();showToast('✅ Gespeichert')">💾 Speichern</button>
       <button class="btn bg btn-sm" style="border:1px solid var(--border)" onclick="avExportPDF()">📄 PDF Export</button>
       <button class="btn bg btn-sm" style="border:1px solid var(--border)" onclick="avShowRespModal()">👤 Verantwortlich</button>
@@ -726,38 +726,49 @@ textarea.note-ta{border:1px solid var(--border);border-radius:5px;padding:4px 8p
   <div class="mhd"><div class="mtitle">❓ Bedienungsanleitung</div><button class="mclose" onclick="document.getElementById('modal-hilfe').classList.remove('open')">✕</button></div>
   <div style="padding:20px 24px;line-height:1.7;font-size:14px">
 
-    <h3 style="margin:0 0 6px;color:#1e3a5c">Zugang zur App</h3>
-    <p style="margin:0 0 4px">Den Link in den Browser-Favoriten speichern. Funktioniert mit Chrome, Edge und Safari auf PC, Mac und iPad.</p>
-    <p style="margin:0 0 16px">Beim Öffnen erscheint oben rechts <strong>⏳ Laden…</strong> — sobald <strong>☁️ Gespeichert</strong> erscheint, sind alle aktuellen Daten geladen.</p>
+    <h3 style="margin:0 0 6px;color:#1e3a5c">🔑 Anmeldung</h3>
+    <p style="margin:0 0 12px">Benutzer auswählen und PIN eingeben. Der erste Benutzer ohne PIN kann beim ersten Login einen neuen PIN festlegen. Ein Administrator verwaltet Benutzer und Rechte im Reiter <strong>⚙️ Admin</strong>.</p>
 
-    <h3 style="margin:0 0 6px;color:#1e3a5c">Bereiche der App</h3>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
-      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Projektleiter</td><td style="padding:6px 10px">Liste aller Projektleiter verwalten</td></tr>
-      <tr><td style="padding:6px 10px;font-weight:600">Vorarbeiter</td><td style="padding:6px 10px">Vorarbeiter, Poliere und Gruppenführer</td></tr>
-      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Baukräne</td><td style="padding:6px 10px">Verfügbare Baukräne verwalten</td></tr>
-      <tr><td style="padding:6px 10px;font-weight:600">Projekte</td><td style="padding:6px 10px">Baustellen anlegen und bearbeiten</td></tr>
-      <tr style="background:#f1f5f9"><td style="padding:6px 10px;font-weight:600">Gantt</td><td style="padding:6px 10px">Grafische Übersicht aller Projekte und Ressourcen</td></tr>
-    </table>
+    <h3 style="margin:0 0 6px;color:#1e3a5c">🏢 Projekte</h3>
+    <p style="margin:0 0 4px">Alle Baustellen auf einen Blick. Mit <strong>+ Neues Projekt</strong> anlegen, ✏️ bearbeiten. Status: <em>Potenzial</em> (grau) oder <em>Auftrag</em> (aktiv).</p>
+    <p style="margin:0 0 12px">Pro Auftrag stehen in der Zeile zwei Buttons: <strong style="color:#4f46e5">AV</strong> (Arbeitsvorbereitung) und <strong style="color:#0f766e">🏗️ DC</strong> (Digital Construction).</p>
 
-    <h3 style="margin:0 0 6px;color:#1e3a5c">Projekt anlegen / bearbeiten</h3>
-    <p style="margin:0 0 4px"><strong>Neu:</strong> Tab Projekte → <em>+ Neues Projekt</em> → Felder ausfüllen → Speichern</p>
-    <p style="margin:0 0 4px"><strong>Bearbeiten:</strong> In der Projektliste auf ✏️ klicken → Änderungen → Speichern</p>
-    <p style="margin:0 0 16px"><strong>Löschen:</strong> 🗑️ Löschen → PIN eingeben: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">pl01</code></p>
+    <h3 style="margin:0 0 6px;color:#1e3a5c">📊 Gantt</h3>
+    <p style="margin:0 0 4px">Zeitliche Übersicht aller Projekte inkl. Poliere, Bauleiter und Krane. Filter auf einzelne Ressourcen möglich.</p>
+    <p style="margin:0 0 12px">Versetzte Krane werden strichliert dargestellt — bei Filter auf den Kran erscheinen automatisch beide Baustellen (Quell- und Zielbaustelle).</p>
 
-    <h3 style="margin:0 0 6px;color:#1e3a5c">Gantt-Diagramm</h3>
-    <p style="margin:0 0 4px">Filter oben links: nach Baustelle, Projektleiter, Vorarbeiter oder Baukran filtern.</p>
-    <p style="margin:0 0 4px">Ansicht: zwischen Wochen- und Monatsansicht wechseln. Strichlierte Balken = Potenziales Projekt.</p>
-    <p style="margin:0 0 16px">Mit <em>Als PDF drucken</em> → Format A4 oder A3 wählen.</p>
+    <h3 style="margin:0 0 6px;color:#1e3a5c">✅ Arbeitsvorbereitung (AV)</h3>
+    <p style="margin:0 0 12px">Checklisten-Übersicht für alle Aufträge. Klick auf ein Projekt öffnet die vollständige AV-Checkliste mit Fortschrittsanzeige je Abschnitt.</p>
 
-    <h3 style="margin:0 0 6px;color:#1e3a5c">Cloud-Status (oben rechts)</h3>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
+    <h3 style="margin:0 0 6px;color:#1e3a5c">📦 Auslastung</h3>
+    <p style="margin:0 0 4px">Gerät-Auslastungsplanung für Gerüste und Schalungen. Ansicht umschalten zwischen <strong>m²</strong>, <strong>€</strong> oder <strong>m²+€</strong>. Wochen- oder Monatsansicht wählbar.</p>
+    <p style="margin:0 0 12px">Gerätetypen (mit Eigentum/Miete-Kennzeichen und Wochenpreis) werden in <strong>Stammdaten</strong> angelegt.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">🏗️ Digital Construction</h3>
+    <p style="margin:0 0 4px">Qualitätsprüfung Ausführungsprojekt nach <strong>73 Kriterien</strong> in 2 Blöcken und 9 Abschnitten.</p>
+    <p style="margin:0 0 4px">Status je Kriterium: <strong>✅ OK</strong> · <strong>⚠️ Teilweise</strong> · <strong>⛔ Fehlt</strong> · <strong>🔍 Prüfen</strong> · <strong>➖ N/A</strong>.</p>
+    <p style="margin:0 0 12px">Fortschritt wird als Balken und Prozentwert je Projekt und Abschnitt angezeigt. Notizen pro Kriterium möglich.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">🗄️ Archiv</h3>
+    <p style="margin:0 0 12px">Abgeschlossene Projekte werden hierher verschoben und sind schreibgeschützt einsehbar.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">📋 Stammdaten</h3>
+    <p style="margin:0 0 12px">Verwaltung von Polieren (PL), Bauleitern (VA), Kranen (BK) sowie Gerüst- und Schalungs-Typen mit Eigentum/Miete-Kennzeichen und optionalem Wochenpreis.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">⚙️ Admin <span style="font-size:12px;font-weight:400;color:#64748b">(nur Administratoren)</span></h3>
+    <p style="margin:0 0 4px"><strong>Benutzerverwaltung:</strong> Neue Benutzer anlegen, PIN zurücksetzen, Admin-Rechte vergeben oder entziehen.</p>
+    <p style="margin:0 0 12px"><strong>Berechtigungen:</strong> Pro Reiter und Benutzer festlegen — <em>Lesen &amp; Schreiben</em>, <em>Nur Lesen</em> oder <em>Kein Zugriff</em>.</p>
+
+    <h3 style="margin:0 0 6px;color:#1e3a5c">☁️ Cloud &amp; Synchronisation</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
       <tr style="background:#f1f5f9"><td style="padding:5px 10px">⏳ Laden…</td><td style="padding:5px 10px">Daten werden aus der Cloud geladen</td></tr>
       <tr><td style="padding:5px 10px">💾 Speichern…</td><td style="padding:5px 10px">Daten werden gespeichert</td></tr>
       <tr style="background:#f1f5f9"><td style="padding:5px 10px">☁️ Gespeichert</td><td style="padding:5px 10px">Alles aktuell — kein manuelles Speichern nötig</td></tr>
-      <tr><td style="padding:5px 10px">⚠️ Offline</td><td style="padding:5px 10px">Keine Cloud-Verbindung</td></tr>
+      <tr><td style="padding:5px 10px">⚠️ Offline</td><td style="padding:5px 10px">Keine Verbindung — Daten lokal</td></tr>
     </table>
+    <p style="margin:8px 0 0;font-size:12px;color:#64748b">Änderungen anderer Mitarbeiter werden nach Klick auf 🔄 Aktualisieren sichtbar. Mit ⬇️ Backup jederzeit lokale JSON-Kopie sichern.</p>
 
-    <p style="margin:0;font-size:12px;color:#64748b">Änderungen eines Mitarbeiters sind für alle anderen nach Klick auf 🔄 Aktualisieren sichtbar. Bei Doppelbelegung eines Baukrans erscheint automatisch eine Warnung.</p>
+  </div>
   </div>
 </div>
 </div>
@@ -2612,17 +2623,17 @@ jbLoad(); // Beim Start immer aktuellste Daten aus der Cloud holen
       <div class="st">🏗️ Digital Construction – Qualitätsprüfung</div>
     </div>
     <div class="av-stats-bar">
-      <div class="av-stat"><div class="val" id="dc-stat-total">0</div><div class="lbl">Aufträge gesamt</div></div>
-      <div class="av-stat green"><div class="val" id="dc-stat-ok">0</div><div class="lbl">Kriterien OK</div></div>
-      <div class="av-stat yellow"><div class="val" id="dc-stat-open">0</div><div class="lbl">Offen / Klärung</div></div>
-      <div class="av-stat red"><div class="val" id="dc-stat-fehlt">0</div><div class="lbl">Fehlt</div></div>
+      <div class="av-stat"><div class="val" id="dc-stat-total">0</div><div class="lbl" id="dc-lbl-total">Aufträge gesamt</div></div>
+      <div class="av-stat green"><div class="val" id="dc-stat-ok">0</div><div class="lbl" id="dc-lbl-ok">Kriterien OK</div></div>
+      <div class="av-stat yellow"><div class="val" id="dc-stat-open">0</div><div class="lbl" id="dc-lbl-open">Offen / Klärung</div></div>
+      <div class="av-stat red"><div class="val" id="dc-stat-fehlt">0</div><div class="lbl" id="dc-lbl-fehlt">Fehlt</div></div>
     </div>
     <div class="av-projects-grid" id="dc-projects-grid"></div>
   </div>
   <!-- DC Detail -->
   <div id="dc-detail" style="display:none">
     <div class="sh">
-      <button class="btn bg btn-sm" onclick="closeDCDetail()" style="margin-right:8px">← Übersicht</button>
+      <button class="btn bg btn-sm" onclick="closeDCDetail()" style="margin-right:8px">${lang==='it'?'← Panoramica':'← Übersicht'}</button>
       <div class="st" id="dc-detail-title">Digital Construction</div>
     </div>
     <div id="dc-content"></div>
@@ -3407,109 +3418,109 @@ function alpSave(){
 // ════════════════════════════════════════════════════════
 
 const DC_DATA = [
-  {block:'I',blockTitle:'Verfügbarkeit der Unterlagen',sections:[
-    {id:'A',title:'A · Projektdokumentation & Formate',sub:'Elenco elaborati, Dateiformate & BIM-Modell',color:'#1d4ed8',items:[
-      {id:'A.1',t:'A.1 · Elenco elaborati – vollständig & geprüft',d:'Planverzeichnis liegt vor, ist vollständig und auf aktuellem Revisionsstand.'},
-      {id:'A.2',t:'A.2 · Allgemeiner Projektbericht (aktuell)',d:'Relazione generale di progetto liegt vor und ist aktuell.'},
-      {id:'A.3',t:'A.3 · Grafische Unterlagen – Format PDF & DWG',d:'Alle Planunterlagen als PDF vorhanden. DWG-Dateien ebenfalls verfügbar.'},
-      {id:'A.4',t:'A.4 · BIM-Modell / IFC-Datei – Verfügbarkeit & Disziplinen',d:'BIM-Modell vorhanden? Format: IFC, natives Format (Revit, Archicad)? Koordinationsmodell zusammengeführt?'},
+  {block:'I',blockTitle:'Verfügbarkeit der Unterlagen',it_blockTitle:"Disponibilità della documentazione",sections:[
+    {id:'A',title:'A · Projektdokumentation & Formate',sub:'Elenco elaborati, Dateiformate & BIM-Modell',color:'#1d4ed8',it_title:"A · Documentazione & formati",it_sub:"Elenco elaborati, formati file & modello BIM",items:[
+      {id:'A.1',t:'A.1 · Elenco elaborati – vollständig & geprüft',d:'Planverzeichnis liegt vor, ist vollständig und auf aktuellem Revisionsstand.',it_t:"A.1 · Elenco elaborati completo e revisionato",it_d:"Elenco elaborati disponibile, completo e aggiornato all'ultima revisione. Tutte le discipline pianificate sono elencate."},
+      {id:'A.2',t:'A.2 · Allgemeiner Projektbericht (aktuell)',d:'Relazione generale di progetto liegt vor und ist aktuell.',it_t:"A.2 · Relazione generale di progetto aggiornata",it_d:"Relazione generale di progetto disponibile e aggiornata. Descrive obiettivi, sistema costruttivo, materiali e requisiti particolari del progetto."},
+      {id:'A.3',t:'A.3 · Grafische Unterlagen – Format PDF & DWG',d:'Alle Planunterlagen als PDF vorhanden. DWG-Dateien ebenfalls verfügbar.',it_t:"A.3 · Elaborati grafici – formato PDF & DWG",it_d:"Tutti gli elaborati disponibili in PDF. File DWG (editabili) anch'essi presenti. Struttura layer, scala e cartiglio corretti."},
+      {id:'A.4',t:'A.4 · BIM-Modell / IFC-Datei – Verfügbarkeit & Disziplinen',d:'BIM-Modell vorhanden? Format: IFC, natives Format (Revit, Archicad)? Koordinationsmodell zusammengeführt?',it_t:"A.4 · Modello BIM / file IFC – disponibilità & discipline",it_d:"Modello BIM disponibile? Formato: IFC, nativo (Revit, Archicad …)? Discipline: architettura, strutturale, impianti (MEP)? Modello di coordinamento unificato?"},
     ]},
-    {id:'B',title:'B · Genehmigungen & Behörden',sub:'Permesso di costruire, Behördenauflagen & Genehmigungen',color:'#7c3aed',items:[
-      {id:'B.1',t:'B.1 · Genehmigungspläne 1:100 (Baugenehmigung / PDC)',d:'Abgleich mit dem Ausführungsprojekt – keine wesentlichen Abweichungen.'},
-      {id:'B.2',t:'B.2 · Baugenehmigung inkl. Auflagen',d:'Baugenehmigungsbescheid liegt vor. Alle behördlichen Auflagen geprüft.'},
-      {id:'B.3',t:'B.3 · Genehmigungen zuständiger Behörden',d:'Forstbehörde, Gartenamt, Nachbarn, Gemeinde, Denkmalschutz – je nach Projektsituation.'},
-      {id:'B.4',t:'B.4 · Stellungnahme Feuerwehr (VVF)',d:'Parere/Nulla osta dei VV.F. vorhanden oder beantragt (falls erforderlich).'},
-      {id:'B.5',t:'B.5 · Nulla osta Sanitätsamt (ASL / AULSS)',d:'Sanitäre Freigabe vorhanden, sofern für die Nutzungsart erforderlich.'},
-      {id:'B.6',t:'B.6 · CAM-Konformitätsnachweis (falls erforderlich)',d:'Attestazione di conformità ai CAM vorhanden, soweit gesetzlich vorgeschrieben.'},
+    {id:'B',title:'B · Genehmigungen & Behörden',sub:'Permesso di costruire, Behördenauflagen & Genehmigungen',color:'#7c3aed',it_title:"B · Permessi & autorizzazioni",it_sub:"Permesso di costruire, prescrizioni & autorizzazioni",items:[
+      {id:'B.1',t:'B.1 · Genehmigungspläne 1:100 (Baugenehmigung / PDC)',d:'Abgleich mit dem Ausführungsprojekt – keine wesentlichen Abweichungen.',it_t:"B.1 · Tavole di progetto 1:100 allegate al PDC",it_d:"Tavole depositate con il Permesso di Costruire in scala 1:100 disponibili. Verifica coerenza con il progetto esecutivo effettuata – nessuna difformità rilevante riscontrata."},
+      {id:'B.2',t:'B.2 · Baugenehmigung inkl. Auflagen',d:'Baugenehmigungsbescheid liegt vor. Alle behördlichen Auflagen geprüft.',it_t:"B.2 · Permesso di Costruire e prescrizioni",it_d:"Decreto del Permesso di Costruire disponibile. Tutte le prescrizioni e condizioni imposte dall'autorità verificate e recepite nel progetto esecutivo."},
+      {id:'B.3',t:'B.3 · Genehmigungen zuständiger Behörden',d:'Forstbehörde, Gartenamt, Nachbarn, Gemeinde, Denkmalschutz – je nach Projektsituation.',it_t:"B.3 · Autorizzazioni enti competenti",it_d:"Tutte le autorizzazioni necessarie ottenute: bacini montani (forestale), giardineria (abbattimento alberi), confinanti, Comune, Soprintendenza, ecc. – in base alla situazione progettuale."},
+      {id:'B.4',t:'B.4 · Stellungnahme Feuerwehr (VVF)',d:'Parere/Nulla osta dei VV.F. vorhanden oder beantragt (falls erforderlich).',it_t:"B.4 · Pareri Vigili del Fuoco (se necessari)",it_d:"Parere/Nulla Osta VV.F. ottenuto o richiesto (se soglia di controllo antincendio raggiunta). Prescrizioni recepite nel progetto esecutivo."},
+      {id:'B.5',t:'B.5 · Nulla osta Sanitätsamt (ASL / AULSS)',d:'Sanitäre Freigabe vorhanden, sofern für die Nutzungsart erforderlich.',it_t:"B.5 · Nulla osta sanitari (ASL / AULSS)",it_d:"Parere sanitario ASL/AULSS disponibile, ove richiesto dalla destinazione d'uso (residenziale, commerciale, settore alimentare, ecc.)."},
+      {id:'B.6',t:'B.6 · CAM-Konformitätsnachweis (falls erforderlich)',d:'Attestazione di conformità ai CAM vorhanden, soweit gesetzlich vorgeschrieben.',it_t:"B.6 · Attestazione conformità CAM (se richiesta)",it_d:"Attestazione di conformità ai CAM (Criteri Ambientali Minimi) disponibile, ove prevista dalla legge (appalti pubblici, incentivi). Requisiti materiali recepiti nel capitolato."},
     ]},
-    {id:'C',title:'C · Urbanistik, Risiken & Erschließung',sub:'Urbanistik, Gefahrenzonen & Erschließung Baufeld',color:'#b45309',items:[
-      {id:'C.1',t:'C.1 · Geländeaufnahme & Bestandsaufnahme',d:'Lage- und Höhenaufnahme des Grundstücks vorhanden.'},
-      {id:'C.2',t:'C.2 · Auszug Durchführungsplan (D.P. / P.d.A.) mit Normen',d:'Auszug mit geltenden Normen liegt vor und ist mit dem AP abgeglichen.'},
-      {id:'C.3',t:'C.3 · Normen Gemeindebauleitplan (G.B.P. / P.U.C.)',d:'Relevante GBP-/PUC-Normen identifiziert und auf Einhaltung geprüft.'},
-      {id:'C.4',t:'C.4 · Prüfung Gefahrenzonen',d:'Grundwasserstand, Rutschgefahr, Steinschlag, Überschwemmung. Altlasten abgeklärt.'},
-      {id:'C.5',t:'C.5 · Prüfung Zufahrt & Baustellenlogistik',d:'Zufahrtsmöglichkeiten definiert. Lastbeschränkungen, Wendebereiche, Lagerplätze geprüft.'},
+    {id:'C',title:'C · Urbanistik, Risiken & Erschließung',sub:'Urbanistik, Gefahrenzonen & Erschließung Baufeld',color:'#b45309',it_title:"C · Urbanistica, rischi & viabilità",it_sub:"Urbanistica, zone di pericolo & accessi al cantiere",items:[
+      {id:'C.1',t:'C.1 · Geländeaufnahme & Bestandsaufnahme',d:'Lage- und Höhenaufnahme des Grundstücks vorhanden.',it_t:"C.1 · Rilievo area di progetto",it_d:"Rilievo planimetrico e altimetrico del lotto disponibile. Stato di fatto, allacciamenti esistenti e fabbricati confinanti rilevati."},
+      {id:'C.2',t:'C.2 · Auszug Durchführungsplan (D.P. / P.d.A.) mit Normen',d:'Auszug mit geltenden Normen liegt vor und ist mit dem AP abgeglichen.',it_t:"C.2 · Estratto P.d.A. con relative norme",it_d:"Se presente un Piano di Attuazione: estratto con le norme vigenti (indici, distanze, altezze, destinazioni) disponibile e verificato rispetto al PE."},
+      {id:'C.3',t:'C.3 · Normen Gemeindebauleitplan (G.B.P. / P.U.C.)',d:'Relevante GBP-/PUC-Normen identifiziert und auf Einhaltung geprüft.',it_t:"C.3 · Norme di PUC (Piano Urbanistico Comunale)",it_d:"Alternativa a C.2 in assenza di P.d.A. Norme di PUC rilevanti identificate e verificate rispetto al progetto esecutivo."},
+      {id:'C.4',t:'C.4 · Prüfung Gefahrenzonen',d:'Grundwasserstand, Rutschgefahr, Steinschlag, Überschwemmung. Altlasten abgeklärt.',it_t:"C.4 · Verifica zone di pericolo",it_d:"Piano delle zone di pericolo verificato: falda freatica, frane, caduta massi, esondazioni. Presenza ordigni bellici inesplosi e terreno inquinato accertata. Perizie specialistiche disponibili se necessario."},
+      {id:'C.5',t:'C.5 · Prüfung Zufahrt & Baustellenlogistik',d:'Zufahrtsmöglichkeiten definiert. Lastbeschränkungen, Wendebereiche, Lagerplätze geprüft.',it_t:"C.5 · Verifica accessi e viabilità di cantiere",it_d:"Possibilità di accesso al cantiere definite. Limitazioni di carico, aree di manovra, depositi e area di cantiere verificati. Viabilità coordinata con enti se necessario."},
     ]},
-    {id:'D',title:'D · Fachberichte & Sonderprojekte',sub:'Fachberichte, Sonderprojekte & Zertifizierungen',color:'#0d9488',items:[
-      {id:'D.1',t:'D.1 · Infrastrukturplan inkl. Anschlussprojekte',d:'Vollständiger Infrastrukturplan: Kanal, Wasser, Strom, Gas, Telekommunikation.'},
-      {id:'D.2',t:'D.2 · Projekt Barrierefreiheit',d:'Projekt zur Beseitigung von Architekturbarrieren liegt vor.'},
-      {id:'D.3',t:'D.3 · Ausführungsprojekt Brandschutz (VVF / esecutivo)',d:'Brandschutzprojekt liegt vor. Alle Anforderungen im AP eingearbeitet.'},
-      {id:'D.4',t:'D.4 · PV-Anlage Projekt (falls vorgesehen)',d:'PV-Projekt vorhanden: Anlagenleistung, Modulanordnung, Wechselrichter definiert.'},
-      {id:'D.5',t:'D.5 · KlimaHaus-Projekt & Berechnung',d:'KlimaHaus-Nachweis vorhanden. Angestrebte Klasse definiert.'},
-      {id:'D.6',t:'D.6 · Schallschutzbericht (Relazione acustica)',d:'Akustischer Bericht vorhanden. Anforderungen je Bauteil definiert.'},
-      {id:'D.7',t:'D.7 · Beleuchtungstechn. Bericht & Berechnung',d:'Beleuchtungsplanung vorhanden. Beleuchtungsstärken berechnet.'},
-      {id:'D.8',t:'D.8 · R.I.E.-Projekt & Berechnung (falls vorgesehen)',d:'Projekt und Berechnung der Reti Idriche Esterne vorhanden.'},
-      {id:'D.9',t:'D.9 · Wartungsplan des Bauwerks (Piano di manutenzione)',d:'Piano di manutenzione vom Planer erstellt (gesetzliche Pflicht).'},
-      {id:'D.10',t:'D.10 · Technische Akte des Bauwerks (Fascicolo tecnico)',d:'Fascicolo tecnico vom Planer erstellt (gesetzliche Pflicht, D.Lgs. 81/2008).'},
+    {id:'D',title:'D · Fachberichte & Sonderprojekte',sub:'Fachberichte, Sonderprojekte & Zertifizierungen',color:'#0d9488',it_title:"D · Relazioni specialistiche & progetti",it_sub:"Relazioni tecniche, progetti speciali & certificazioni",items:[
+      {id:'D.1',t:'D.1 · Infrastrukturplan inkl. Anschlussprojekte',d:'Vollständiger Infrastrukturplan: Kanal, Wasser, Strom, Gas, Telekommunikation.',it_t:"D.1 · Piano delle infrastrutture completo di progetto allacciamenti",it_d:"Piano infrastrutturale completo: fognatura, acqua potabile, energia elettrica, gas, telecomunicazioni progettati. Gestori identificati. Pianificazione allacciamenti per fasi cantiere disponibile."},
+      {id:'D.2',t:'D.2 · Projekt Barrierefreiheit',d:'Projekt zur Beseitigung von Architekturbarrieren liegt vor.',it_t:"D.2 · Progetto barriere architettoniche",it_d:"Progetto di eliminazione delle barriere architettoniche disponibile. Requisiti (rampe, ascensore, larghezze porte, servizi igienici) recepiti nel PE."},
+      {id:'D.3',t:'D.3 · Ausführungsprojekt Brandschutz (VVF / esecutivo)',d:'Brandschutzprojekt liegt vor. Alle Anforderungen im AP eingearbeitet.',it_t:"D.3 · Progetto di prevenzione incendi esecutivo",it_d:"Progetto antincendio esecutivo disponibile. Nulla Osta VV.F. ottenuto o richiesto. Prescrizioni (lunghezze vie di fuga, compartimentazioni, sprinkler, rilevatori) recepite nel PE."},
+      {id:'D.4',t:'D.4 · PV-Anlage Projekt (falls vorgesehen)',d:'PV-Projekt vorhanden: Anlagenleistung, Modulanordnung, Wechselrichter definiert.',it_t:"D.4 · Progetto impianto fotovoltaico (se previsto)",it_d:"Progetto FV disponibile: potenza impianto, disposizione moduli, inverter, schema di immissione in rete definiti. Carico strutturale in copertura verificato."},
+      {id:'D.5',t:'D.5 · KlimaHaus-Projekt & Berechnung',d:'KlimaHaus-Nachweis vorhanden. Angestrebte Klasse definiert.',it_t:"D.5 · Progetto e calcolo CasaClima",it_d:"Relazione e calcolo CasaClima disponibili. Classe energetica obiettivo definita. Stratigrafie e valori energetici coerenti con il PE."},
+      {id:'D.6',t:'D.6 · Schallschutzbericht (Relazione acustica)',d:'Akustischer Bericht vorhanden. Anforderungen je Bauteil definiert.',it_t:"D.6 · Relazione acustica",it_d:"Relazione acustica disponibile. Classi di prestazione acustica e requisiti per ciascun elemento definiti. Coerenza con stratigrafie di pareti e solai nel PE verificata."},
+      {id:'D.7',t:'D.7 · Beleuchtungstechn. Bericht & Berechnung',d:'Beleuchtungsplanung vorhanden. Beleuchtungsstärken berechnet.',it_t:"D.7 · Relazione e calcolo illuminotecnico (se previsto)",it_d:"Progetto illuminotecnico disponibile. Illuminamenti e illuminazione di sicurezza calcolati per area. Requisiti recepiti nel progetto elettrico."},
+      {id:'D.8',t:'D.8 · R.I.E.-Projekt & Berechnung (falls vorgesehen)',d:'Projekt und Berechnung der Reti Idriche Esterne vorhanden.',it_t:"D.8 · Progetto e calcolo R.I.E. (se previsto)",it_d:"Progetto e calcolo Reti Idriche Esterne disponibili. Portate di allacciamento definite. Approvazione del gestore ottenuta o in corso."},
+      {id:'D.9',t:'D.9 · Wartungsplan des Bauwerks (Piano di manutenzione)',d:'Piano di manutenzione vom Planer erstellt (gesetzliche Pflicht).',it_t:"D.9 · Piano di manutenzione dell'opera",it_d:"Piano di manutenzione redatto dal progettista (obbligo di legge, non sempre allegato agli esecutivi). Intervalli di manutenzione per tutti gli elementi e impianti definiti."},
+      {id:'D.10',t:'D.10 · Technische Akte des Bauwerks (Fascicolo tecnico)',d:'Fascicolo tecnico vom Planer erstellt (gesetzliche Pflicht, D.Lgs. 81/2008).',it_t:"D.10 · Fascicolo tecnico dell'opera",it_d:"Fascicolo tecnico dell'opera redatto dal progettista (obbligo D.Lgs. 81/2008). Finalizzato alla sicurezza durante future operazioni di manutenzione e ristrutturazione."},
     ]},
-    {id:'E',title:'E · Vertrag, Kosten & Sicherheit',sub:'Vertrag, Kostenplan, Sicherheit & Terminprogramm',color:'#dc2626',items:[
-      {id:'E.1',t:'E.1 · Besonderes Leistungsverzeichnis (Capitolato speciale)',d:'Technische Anforderungen, Materialspezifikationen für alle Gewerke definiert.'},
-      {id:'E.2',t:'E.2 · Kostenermittlung / Massenberechnung (Computo metrico)',d:'Mengen plausibel und konsistent mit den Ausführungsplänen.'},
-      {id:'E.3',t:'E.3 · Schätzung Sicherheitskosten (Stima costi sicurezza)',d:'Gesondert ausgewiesen (D.Lgs. 81/2008). Nicht verhandelbar.'},
-      {id:'E.4',t:'E.4 · Bauzeitplan (Cronoprogramma lavori)',d:'Phasen, Meilensteine und kritische Abhängigkeiten eingetragen.'},
-      {id:'E.5',t:'E.5 · Sicherheits- und Gesundheitsschutzplan (PSC / SiGePlan)',d:'PSC vollständig ausgearbeitet, vom Koordinator (CSP) unterzeichnet.'},
-      {id:'E.6',t:'E.6 · Projekt Absturzsicherung & Provisorien',d:'Temporäre Sicherungsmaßnahmen vorhanden, sofern erforderlich.'},
+    {id:'E',title:'E · Vertrag, Kosten & Sicherheit',sub:'Vertrag, Kostenplan, Sicherheit & Terminprogramm',color:'#dc2626',it_title:"E · Contratto, costi & sicurezza",it_sub:"Contratto, computo metrico, sicurezza & cronoprogramma",items:[
+      {id:'E.1',t:'E.1 · Besonderes Leistungsverzeichnis (Capitolato speciale)',d:'Technische Anforderungen, Materialspezifikationen für alle Gewerke definiert.',it_t:"E.1 · Capitolato speciale d'appalto",it_d:"Capitolato speciale d'appalto disponibile. Requisiti tecnici, specifiche materiali e standard esecutivi per tutte le lavorazioni definiti."},
+      {id:'E.2',t:'E.2 · Kostenermittlung / Massenberechnung (Computo metrico)',d:'Mengen plausibel und konsistent mit den Ausführungsplänen.',it_t:"E.2 · Computo metrico estimativo",it_d:"Computo metrico estimativo disponibile. Quantità plausibili e coerenti con gli elaborati grafici. Base per il bando e la contabilità lavori."},
+      {id:'E.3',t:'E.3 · Schätzung Sicherheitskosten (Stima costi sicurezza)',d:'Gesondert ausgewiesen (D.Lgs. 81/2008). Nicht verhandelbar.',it_t:"E.3 · Stima costi sicurezza",it_d:"Stima dei costi della sicurezza evidenziata separatamente (D.Lgs. 81/2008). Non soggetta a ribasso e inclusa nel prezzo d'appalto."},
+      {id:'E.4',t:'E.4 · Bauzeitplan (Cronoprogramma lavori)',d:'Phasen, Meilensteine und kritische Abhängigkeiten eingetragen.',it_t:"E.4 · Cronoprogramma lavori",it_d:"Cronoprogramma disponibile. Fasi, milestones e dipendenze critiche (autorizzazioni, tempi di approvvigionamento, interfacce) indicate. Concordato con la direzione lavori e l'AV."},
+      {id:'E.5',t:'E.5 · Sicherheits- und Gesundheitsschutzplan (PSC / SiGePlan)',d:'PSC vollständig ausgearbeitet, vom Koordinator (CSP) unterzeichnet.',it_t:"E.5 · PSC completo (Piano di Sicurezza e Coordinamento)",it_d:"PSC completo, redatto e firmato dal Coordinatore per la Sicurezza in Progettazione (CSP). Tutte le fasi lavorative coperte. Deve essere disponibile prima dell'inizio lavori."},
+      {id:'E.6',t:'E.6 · Projekt Absturzsicherung & Provisorien',d:'Temporäre Sicherungsmaßnahmen vorhanden, sofern erforderlich.',it_t:"E.6 · Progetto opere provvisionali (se previste o necessarie)",it_d:"Progetto delle opere provvisionali (ponteggi, sbadacchiature, recinzioni di cantiere) disponibile ove necessario o imposto. Calcolo statico allegato."},
     ]},
   ]},
-  {block:'II',blockTitle:'Qualitätsprüfung des Ausführungsprojekts',sections:[
-    {id:'1',title:'1 · Rohbau & Konstruktion',sub:'Konstruktive Vollständigkeit, Maße, Bewehrung & Schalmasse',color:'#1e40af',items:[
-      {id:'1.1',t:'1.1 · Vollständigkeit der Grundrisse',d:'Alle Geschosse vorhanden (UG, EG, OG, DG), Sonderebenen vollständig.'},
-      {id:'1.2',t:'1.2 · Maßketten & Bemaßung',d:'Konstruktive und architektonische Maßketten vollständig eingetragen.'},
-      {id:'1.3',t:'1.3 · Öffnungen, Aussparungen & Durchbrüche',d:'Alle Türen, Fenster, TGA-Durchführungen mit Mindestmaßen.'},
-      {id:'1.4',t:'1.4 · Wandstärken & Materialien',d:'Alle Wände mit Stärken und Materialangabe. Legende vorhanden.'},
-      {id:'1.5',t:'1.5 · Deckenaufbauten & Stärken',d:'Deckendicken je Geschoss eingetragen. Sonderbereiche definiert.'},
-      {id:'1.6',t:'1.6 · Höhenkoten & Geschosshöhen',d:'ROK, FOK, FUK und Fertigfußboden-Höhen definiert.'},
-      {id:'1.7',t:'1.7 · Schnitte (Längs- & Querschnitte)',d:'Mind. 2 Längsschnitte und 1 Querschnitt mit Höhenkoten.'},
-      {id:'1.8',t:'1.8 · Treppenhäuser & Aufzugsschächte',d:'Treppenkonstruktion, Stufenmaße, Handlaufangaben. Aufzugsgrube definiert.'},
-      {id:'1.9',t:'1.9 · Dehnungsfugen & Konstruktionsfugen',d:'Lage und Ausbildung eingetragen. Fugendetails vorhanden.'},
-      {id:'1.10',t:'1.10 · Kellerbereich & Abdichtungskonzept (UG)',d:'Abdichtungsart und -lage im UG definiert.'},
-      {id:'1.11',t:'1.11 · Dachkonstruktion (Grundriss & Schnitt)',d:'Dachaufbau, Sparren-/Pfettenmaße, Gefälle eingetragen.'},
-      {id:'1.12',t:'1.12 · Details für kritische Konstruktionspunkte',d:'Detailzeichnungen für Balkone, Attikas, Kelleranschluss. Min. M 1:10.'},
-      {id:'1.13',t:'1.13 · Rohbauöffnung & architektonisches Maß',d:'Rohbauöffnung und fertige architektonische Öffnung klar angegeben.'},
-      {id:'1.14',t:'1.14 · Schalmaße für Wände & Decken',d:'Bemaßung explizit als Rohbaumaß angegeben (für Polier, Zimmerei).'},
-      {id:'1.15',t:'1.15 · Konsistenz Pläne ↔ Abachi (Türen, Wände, Böden)',d:'Türen-, Wand- und Bodenabachi vorhanden und konsistent.'},
+  {block:'II',blockTitle:'Qualitätsprüfung des Ausführungsprojekts',it_blockTitle:"Verifica della qualità del progetto esecutivo",sections:[
+    {id:'1',title:'1 · Rohbau & Konstruktion',sub:'Konstruktive Vollständigkeit, Maße, Bewehrung & Schalmasse',color:'#1e40af',it_title:"1 · Struttura grezza & costruzione",it_sub:"Completezza costruttiva, misure, armature & casseri",items:[
+      {id:'1.1',t:'1.1 · Vollständigkeit der Grundrisse',d:'Alle Geschosse vorhanden (UG, EG, OG, DG), Sonderebenen vollständig.',it_t:"1.1 · Completezza delle planimetrie",it_d:"Tutti i piani presenti (interrato, piano terra, piani superiori, mansarda, piano tipo), livelli speciali nominati e completamente elaborati."},
+      {id:'1.2',t:'1.2 · Maßketten & Bemaßung',d:'Konstruktive und architektonische Maßketten vollständig eingetragen.',it_t:"1.2 · Quote e dimensionamento",it_d:"Catene di quote costruttive e architettoniche completamente inserite. Griglia degli assi e quote struttura grezza chiaramente distinguibili."},
+      {id:'1.3',t:'1.3 · Öffnungen, Aussparungen & Durchbrüche',d:'Alle Türen, Fenster, TGA-Durchführungen mit Mindestmaßen.',it_t:"1.3 · Aperture, cavità e passaggi",it_d:"Tutte le porte, finestre, lucernari, finestre interrato; cavità per passaggi impianti con misure minime indicate."},
+      {id:'1.4',t:'1.4 · Wandstärken & Materialien',d:'Alle Wände mit Stärken und Materialangabe. Legende vorhanden.',it_t:"1.4 · Spessori pareti & materiali",it_d:"Tutte le pareti portanti e non portanti con spessori e indicazione materiale (calcestruzzo, muratura, tipo). Legenda presente."},
+      {id:'1.5',t:'1.5 · Deckenaufbauten & Stärken',d:'Deckendicken je Geschoss eingetragen. Sonderbereiche definiert.',it_t:"1.5 · Stratigrafia solai & spessori",it_d:"Spessori solaio inseriti per piano. Differenze in aree speciali (bagni, terrazze, garage interrato) definite."},
+      {id:'1.6',t:'1.6 · Höhenkoten & Geschosshöhen',d:'ROK, FOK, FUK und Fertigfußboden-Höhen definiert.',it_t:"1.6 · Quote altimetriche & altezze piano",it_d:"Quote ROK, FOK, FUK e pavimento finito definite. Dislivelli e differenze di quota inserite."},
+      {id:'1.7',t:'1.7 · Schnitte (Längs- & Querschnitte)',d:'Mind. 2 Längsschnitte und 1 Querschnitt mit Höhenkoten.',it_t:"1.7 · Sezioni (longitudinali & trasversali)",it_d:"Minimo 2 sezioni longitudinali e 1 trasversale, tutte con quote altimetriche, stratigrafie solai e pavimenti."},
+      {id:'1.8',t:'1.8 · Treppenhäuser & Aufzugsschächte',d:'Treppenkonstruktion, Stufenmaße, Handlaufangaben. Aufzugsgrube definiert.',it_t:"1.8 · Vani scala & vani ascensore",it_d:"Costruzione scala, misure gradini (alzata/pedata), corrimano. Dimensioni fossa ascensore e altezza testa vano definite."},
+      {id:'1.9',t:'1.9 · Dehnungsfugen & Konstruktionsfugen',d:'Lage und Ausbildung eingetragen. Fugendetails vorhanden.',it_t:"1.9 · Giunti di dilatazione & giunti costruttivi",it_d:"Posizione e conformazione dei giunti di dilatazione e separazione inserite. Dettagli giunto presenti."},
+      {id:'1.10',t:'1.10 · Kellerbereich & Abdichtungskonzept (UG)',d:'Abdichtungsart und -lage im UG definiert.',it_t:"1.10 · Interrato & impermeabilizzazione (PI)",it_d:"Tipo e posizione impermeabilizzazione in PI definiti. Parete interrato, platea di fondazione, isolamento perimetrale inseriti."},
+      {id:'1.11',t:'1.11 · Dachkonstruktion (Grundriss & Schnitt)',d:'Dachaufbau, Sparren-/Pfettenmaße, Gefälle eingetragen.',it_t:"1.11 · Struttura tetto (planimetria & sezione)",it_d:"Stratigrafia tetto, dimensioni travetti/travi di colmo, pendenza, altezza colmo e gronda, aggetti inseriti."},
+      {id:'1.12',t:'1.12 · Details für kritische Konstruktionspunkte',d:'Detailzeichnungen für Balkone, Attikas, Kelleranschluss. Min. M 1:10.',it_t:"1.12 · Dettagli per nodi costruttivi critici",it_d:"Disegni di dettaglio per balconi, attico, raccordo interrato, piede parete. Scala minima 1:10 presente."},
+      {id:'1.13',t:'1.13 · Rohbauöffnung & architektonisches Maß',d:'Rohbauöffnung und fertige architektonische Öffnung klar angegeben.',it_t:"1.13 · Foro grezzo & foro architettonico (dimensioni nette)",it_d:"Per tutte le porte e finestre sono chiaramente indicate sia le dimensioni del foro grezzo (struttura grezza, prima delle finiture) sia quelle del foro architettonico (dimensione netta a finitura ultimata). Indicazione separata in pianta e prospetti."},
+      {id:'1.14',t:'1.14 · Schalmaße für Wände & Decken',d:'Bemaßung explizit als Rohbaumaß angegeben (für Polier, Zimmerei).',it_t:"1.14 · Quote per la casseratura di pareti e solai",it_d:"Le dimensioni di pareti e solai sono indicate esplicitamente come misure di struttura grezza (per la casseratura) – non solo come misure finite. Essenziale per il caposquadra, la carpenteria e il getto in opera."},
+      {id:'1.15',t:'1.15 · Konsistenz Pläne ↔ Abachi (Türen, Wände, Böden)',d:'Türen-, Wand- und Bodenabachi vorhanden und konsistent.',it_t:"1.15 · Coerenza elaborati grafici ↔ abachi (porte, pareti, pavimenti)",it_d:"Abachi di porte, pareti e pavimenti presenti e coerenti con gli elaborati grafici. Dimensioni, indicazioni di materiali e posizioni coincidono tra tavole e tabelle."},
     ]},
-    {id:'2',title:'2 · Haustechnik & TGA',sub:'Sanitär, Heizung, Lüftung, Elektro & Koordinationsplanung',color:'#0891b2',items:[
-      {id:'2.1',t:'2.1 · Schachtpositionen & Schachtgrößen',d:'Alle Steig- und Installationsschächte positioniert und bemaßt.'},
-      {id:'2.2',t:'2.2 · Leitungsführung Sanitär koordiniert',d:'Fallleitungen, Grundleitungen, Wasserversorgung definiert.'},
-      {id:'2.3',t:'2.3 · Heizung & Lüftung (Trassen & Querschnitte)',d:'Lüftungskanäle mit Trasse eingetragen. Raumhöhen prüfbar.'},
-      {id:'2.4',t:'2.4 · Elektro & Schwachstrom (Trassen)',d:'Elektrosteigleitungen, Verteilerstandorte, Unterverteilungen eingetragen.'},
-      {id:'2.5',t:'2.5 · Einbauten (Wannen, Duschen, Nischen)',d:'Sanitäreinbauten mit Anschlussmaßen eingetragen.'},
-      {id:'2.6',t:'2.6 · Technikräume dimensioniert & zugänglich',d:'Heizraum, UVB-Raum, Lüftungszentrale ausreichend dimensioniert.'},
-      {id:'2.7',t:'2.7 · Brandabschnitte & TGA-Durchbrüche',d:'Brandschutzabschnitte eingetragen. Durchbrüche definiert.'},
-      {id:'2.8',t:'2.8 · Installationswände & -ebenen definiert',d:'Installationswände in Nasszellen und Küchen eingetragen.'},
+    {id:'2',title:'2 · Haustechnik & TGA',sub:'Sanitär, Heizung, Lüftung, Elektro & Koordinationsplanung',color:'#0891b2',it_title:"2 · Impianti & TGA",it_sub:"Sanitario, riscaldamento, ventilazione, elettrico & coordinamento",items:[
+      {id:'2.1',t:'2.1 · Schachtpositionen & Schachtgrößen',d:'Alle Steig- und Installationsschächte positioniert und bemaßt.',it_t:"2.1 · Posizioni e dimensioni cavedi",it_d:"Tutti i cavedi impiantistici posizionati e dimensionati. Accessibilità (aperture di ispezione) inserita."},
+      {id:'2.2',t:'2.2 · Leitungsführung Sanitär koordiniert',d:'Fallleitungen, Grundleitungen, Wasserversorgung definiert.',it_t:"2.2 · Percorso impianti sanitari coordinato",it_d:"Colonne di scarico, tubazioni principali, alimentazione idrica definite. Verifica collisioni con struttura grezza riconoscibile."},
+      {id:'2.3',t:'2.3 · Heizung & Lüftung (Trassen & Querschnitte)',d:'Lüftungskanäle mit Trasse eingetragen. Raumhöhen prüfbar.',it_t:"2.3 · Riscaldamento & ventilazione (percorsi & sezioni)",it_d:"Canali ventilazione con percorso e sezione inseriti. Distribuzione circuiti riscaldamento e punti di consegna definiti."},
+      {id:'2.4',t:'2.4 · Elektro & Schwachstrom (Trassen)',d:'Elektrosteigleitungen, Verteilerstandorte, Unterverteilungen eingetragen.',it_t:"2.4 · Impianto elettrico & dati (percorsi)",it_d:"Colonne elettriche montanti, posizioni quadri, quadri secondari inseriti. Percorso cavi coordinato con struttura grezza."},
+      {id:'2.5',t:'2.5 · Einbauten (Wannen, Duschen, Nischen)',d:'Sanitäreinbauten mit Anschlussmaßen eingetragen.',it_t:"2.5 · Elementi incassati (vasche, docce, nicchie)",it_d:"Elementi sanitari incassati con misure di allacciamento. Pendenza piatto doccia definita. Altezza vasca considerata."},
+      {id:'2.6',t:'2.6 · Technikräume dimensioniert & zugänglich',d:'Heizraum, UVB-Raum, Lüftungszentrale ausreichend dimensioniert.',it_t:"2.6 · Locali tecnici dimensionati & accessibili",it_d:"Locale caldaia, quadro elettrico, centrale ventilazione adeguatamente dimensionati. Posizionamento apparecchi e accessi manutenzione verificati."},
+      {id:'2.7',t:'2.7 · Brandabschnitte & TGA-Durchbrüche',d:'Brandschutzabschnitte eingetragen. Durchbrüche definiert.',it_t:"2.7 · Compartimenti antincendio & passaggi TGA",it_d:"Compartimentazioni antincendio nel PE inserite. Passaggi impianti attraverso elementi strutturali rilevanti definiti."},
+      {id:'2.8',t:'2.8 · Installationswände & -ebenen definiert',d:'Installationswände in Nasszellen und Küchen eingetragen.',it_t:"2.8 · Pareti e piani di installazione definiti",it_d:"Pareti di installazione in bagni e cucine inserite (installazione a parete). Piano di installazione sotto soffitto/pavimento considerato."},
     ]},
-    {id:'3',title:'3 · Ausbau & Fassade',sub:'Bodenbeläge, Wände, Decken, Türen, Fenster & Fassade',color:'#059669',items:[
-      {id:'3.1',t:'3.1 · Bodenaufbauten & Estrichdicken',d:'Aufbauten je Raum definiert (Trittschalldämmung, Estrich, Belag).'},
-      {id:'3.2',t:'3.2 · Wandverkleidungen & Putzdicken',d:'Innenputzdicken je Wandtyp angegeben.'},
-      {id:'3.3',t:'3.3 · Fassadenaufbau & Dämmung',d:'Fassadensystem definiert. Dämmstärken je Wandseite eingetragen.'},
-      {id:'3.4',t:'3.4 · Abdichtungsebenen (Balkone, Terrassen, Feuchträume)',d:'Abdichtungsart und Lage eingetragen. Gefälle erkennbar.'},
-      {id:'3.5',t:'3.5 · Entwässerungskonzept (Gefälle, Abläufe, Rinnen)',d:'Flächengefälle eingetragen (min. 1,5 %). Ablaufpositionen definiert.'},
-      {id:'3.6',t:'3.6 · Fenster- & Türanschlüsse (Leibung, Sturz, Schwelle)',d:'Fenster- und Türdetails vorhanden. Barrierefreiheit geprüft.'},
-      {id:'3.7',t:'3.7 · Sockelbereich & Außenanschluss',d:'Sockeldetail vorhanden (Abdichtung, Dämmung, Entwässerung).'},
-      {id:'3.8',t:'3.8 · Außenanlagen & Erschließung',d:'Wege, Parkierung, Bepflanzung, Einfriedung grob definiert.'},
-      {id:'3.9',t:'3.9 · Deckenverkleidungen & abgehängte Decken',d:'Abgehängte Decken mit Unterkantenhöhe eingetragen.'},
+    {id:'3',title:'3 · Ausbau & Fassade',sub:'Bodenbeläge, Wände, Decken, Türen, Fenster & Fassade',color:'#059669',it_title:"3 · Finiture & facciata",it_sub:"Pavimenti, pareti, soffitti, porte, finestre & facciata",items:[
+      {id:'3.1',t:'3.1 · Bodenaufbauten & Estrichdicken',d:'Aufbauten je Raum definiert (Trittschalldämmung, Estrich, Belag).',it_t:"3.1 · Stratigrafia pavimenti & spessori massetto",it_d:"Stratigrafie definite per locale/area (isolamento acustico, massetto, rivestimento). Spessori con indicazioni pendenza in aree bagnate."},
+      {id:'3.2',t:'3.2 · Wandverkleidungen & Putzdicken',d:'Innenputzdicken je Wandtyp angegeben.',it_t:"3.2 · Rivestimenti pareti & spessori intonaco",it_d:"Spessori intonaco interno per tipo di parete indicati. Aree piastrellate, cartongesso, intonaco acustico differenziati."},
+      {id:'3.3',t:'3.3 · Fassadenaufbau & Dämmung',d:'Fassadensystem definiert. Dämmstärken je Wandseite eingetragen.',it_t:"3.3 · Stratigrafia facciata & isolamento",it_d:"Sistema facciata definito (cappotto, facciata ventilata, calcestruzzo a vista). Spessori isolamento per lato parete inseriti."},
+      {id:'3.4',t:'3.4 · Abdichtungsebenen (Balkone, Terrassen, Feuchträume)',d:'Abdichtungsart und Lage eingetragen. Gefälle erkennbar.',it_t:"3.4 · Strati impermeabilizzanti (balconi, terrazze, locali umidi)",it_d:"Tipo e posizione impermeabilizzazione inseriti. Altezze raccordo a pareti e soglie definite. Pendenza riconoscibile."},
+      {id:'3.5',t:'3.5 · Entwässerungskonzept (Gefälle, Abläufe, Rinnen)',d:'Flächengefälle eingetragen (min. 1,5 %). Ablaufpositionen definiert.',it_t:"3.5 · Concetto drenaggio (pendenze, scarichi, canalette)",it_d:"Pendenza superfici inserita (min. 1,5 %). Posizioni scarichi definite. Canalette e troppopieno presenti."},
+      {id:'3.6',t:'3.6 · Fenster- & Türanschlüsse (Leibung, Sturz, Schwelle)',d:'Fenster- und Türdetails vorhanden. Barrierefreiheit geprüft.',it_t:"3.6 · Raccordi finestre & porte (strombatura, architrave, soglia)",it_d:"Dettagli finestre e porte presenti. Profondità strombatura, architrave, raccordo isolamento/impermeabilizzazione inseriti. Accessibilità verificata."},
+      {id:'3.7',t:'3.7 · Sockelbereich & Außenanschluss',d:'Sockeldetail vorhanden (Abdichtung, Dämmung, Entwässerung).',it_t:"3.7 · Zoccolo & raccordo esterno",it_d:"Dettaglio zoccolo presente (impermeabilizzazione, isolamento, drenaggio). Raccordo al terreno e andamento quota terreno definiti."},
+      {id:'3.8',t:'3.8 · Außenanlagen & Erschließung',d:'Wege, Parkierung, Bepflanzung, Einfriedung grob definiert.',it_t:"3.8 · Sistemazioni esterne & accessi",it_d:"Percorsi, parcheggi, aree verdi, recinzione e illuminazione esterna definiti in linea di massima. Sezioni del terreno presenti."},
+      {id:'3.9',t:'3.9 · Deckenverkleidungen & abgehängte Decken',d:'Abgehängte Decken mit Unterkantenhöhe eingetragen.',it_t:"3.9 · Controsoffitti & soffitti ribassati",it_d:"Controsoffitti inseriti con quota intradosso. Piano di installazione sovrastante considerato. Classe antincendio indicata."},
     ]},
-    {id:'4',title:'4 · Schnittstellen',sub:'Statik, Bauphysik, Akustik, Brandschutz & Schnittstellenabstimmung',color:'#7c3aed',items:[
-      {id:'4.1',t:'4.1 · Konsistenz Architektur ↔ Statik (Träger, Stützen, Unterzüge)',d:'Tragende Elemente aus Statik im AP eingetragen.'},
-      {id:'4.2',t:'4.2 · Fundamentplan vorhanden & abgestimmt',d:'Fundamentplan des Statikers liegt vor und ist mit Architektur abgestimmt.'},
-      {id:'4.3',t:'4.3 · Lastannahmen für Sonderkonstruktionen',d:'Besondere Lasten klar definiert. Freigabe durch Statiker dokumentiert.'},
-      {id:'4.4',t:'4.4 · Bauphysik: U-Werte & Wandaufbauten definiert',d:'Alle Außenbauteile mit U-Wert-Angabe. Konsistent mit Energieausweis.'},
-      {id:'4.5',t:'4.5 · Wärmebrückendetails (kritische Punkte)',d:'Balkonplatte, Attika, Fensterleibung mit Detailzeichnungen.'},
-      {id:'4.6',t:'4.6 · Akustik: Trennwände & Decken klassifiziert',d:'Schallschutzanforderungen je Raumnutzung eingetragen.'},
-      {id:'4.7',t:'4.7 · Brandschutzkonzept erkennbar & konsistent',d:'Brandabschnitte, Flucht- und Rettungswege im AP eingetragen.'},
-      {id:'4.8',t:'4.8 · Planstände abgestimmt & aktuell',d:'Alle Fachplaner-Pläne auf gleichem Revisionsstand.'},
-      {id:'4.9',t:'4.9 · BIM-Modell vorhanden & aktuell (falls vereinbart)',d:'IFC-Modell vorhanden. Koordinationsmodell zusammengeführt.'},
-      {id:'4.10',t:'4.10 · Bewehrungspläne & Eisenliste vorhanden',d:'Schal- und Bewehrungszeichnungen vorhanden. Eisenliste für AV und Einkauf.'},
+    {id:'4',title:'4 · Schnittstellen',sub:'Statik, Bauphysik, Akustik, Brandschutz & Schnittstellenabstimmung',color:'#7c3aed',it_title:"4 · Interfacce",it_sub:"Statica, fisica edile, acustica, antincendio & coordinamento interfacce",items:[
+      {id:'4.1',t:'4.1 · Konsistenz Architektur ↔ Statik (Träger, Stützen, Unterzüge)',d:'Tragende Elemente aus Statik im AP eingetragen.',it_t:"4.1 · Coerenza architettura ↔ struttura (travi, pilastri, travi di elevazione)",it_d:"Elementi portanti da calcolo strutturale inseriti nel PE. Sezioni, altezze e assi coincidenti. Nessuna contraddizione tra elaborati."},
+      {id:'4.2',t:'4.2 · Fundamentplan vorhanden & abgestimmt',d:'Fundamentplan des Statikers liegt vor und ist mit Architektur abgestimmt.',it_t:"4.2 · Piano fondazioni disponibile & coordinato",it_d:"Piano fondazioni del calcolatore disponibile e coordinato con architettura. Quote intradosso fondazioni definite."},
+      {id:'4.3',t:'4.3 · Lastannahmen für Sonderkonstruktionen',d:'Besondere Lasten klar definiert. Freigabe durch Statiker dokumentiert.',it_t:"4.3 · Ipotesi di carico per costruzioni speciali",it_d:"Carichi particolari (facciata, gru, centrale tecnica in copertura) chiaramente definiti. Approvazione strutturale documentata."},
+      {id:'4.4',t:'4.4 · Bauphysik: U-Werte & Wandaufbauten definiert',d:'Alle Außenbauteile mit U-Wert-Angabe. Konsistent mit Energieausweis.',it_t:"4.4 · Fisica edilizia: valori U & stratigrafie definiti",it_d:"Tutti gli elementi di involucro collegati a valore U o relazione. Stratigrafie coerenti con attestato energetico."},
+      {id:'4.5',t:'4.5 · Wärmebrückendetails (kritische Punkte)',d:'Balkonplatte, Attika, Fensterleibung mit Detailzeichnungen.',it_t:"4.5 · Dettagli ponti termici (punti critici)",it_d:"Raccordi con ponti termici rilevanti (lastra balcone, attico, strombatura finestra) con disegni di dettaglio allegati."},
+      {id:'4.6',t:'4.6 · Akustik: Trennwände & Decken klassifiziert',d:'Schallschutzanforderungen je Raumnutzung eingetragen.',it_t:"4.6 · Acustica: pareti divisorie & solai classificati",it_d:"Requisiti fonoassorbenti per destinazione d'uso inseriti. Elementi divisori con valore R'w di riferimento indicato."},
+      {id:'4.7',t:'4.7 · Brandschutzkonzept erkennbar & konsistent',d:'Brandabschnitte, Flucht- und Rettungswege im AP eingetragen.',it_t:"4.7 · Concetto antincendio riconoscibile & coerente",it_d:"Compartimenti, vie di fuga e soccorso, classi di resistenza al fuoco inserite nel PE. Relazione antincendio disponibile."},
+      {id:'4.8',t:'4.8 · Planstände abgestimmt & aktuell',d:'Alle Fachplaner-Pläne auf gleichem Revisionsstand.',it_t:"4.8 · Revisioni piani coordinate & aggiornate",it_d:"Tutti gli elaborati dei progettisti allo stesso stato di revisione. Data e numero revisione coincidenti. Elenco elaborati presente."},
+      {id:'4.9',t:'4.9 · BIM-Modell vorhanden & aktuell (falls vereinbart)',d:'IFC-Modell vorhanden. Koordinationsmodell zusammengeführt.',it_t:"4.9 · Modello BIM disponibile & aggiornato (se concordato)",it_d:"Modello IFC dell'architetto disponibile. Modello di coordinamento unificato. Clash detection documentata (BCF)."},
+      {id:'4.10',t:'4.10 · Bewehrungspläne & Eisenliste vorhanden',d:'Schal- und Bewehrungszeichnungen vorhanden. Eisenliste für AV und Einkauf.',it_t:"4.10 · Disegni dei ferri & calcolo quantità disponibili",it_d:"Disegni di cassero e armatura del calcolatore strutturale disponibili. Lista ferri / calcolo quantità presente o pianificato per la fase esecutiva. Rilevante per l'AV e l'approvvigionamento."},
     ]},
   ]},
 ];
 
 const DC_STATUS_CFG = {
-  gruen:       {label:'✅ OK',        bg:'#dcfce7',border:'#16a34a',color:'#15803d'},
-  gelb:        {label:'⚠️ Teilw.',    bg:'#fef9c3',border:'#ca8a04',color:'#a16207'},
-  rot:         {label:'⛔ Fehlt',     bg:'#fee2e2',border:'#dc2626',color:'#b91c1c'},
-  zu_pruefen:  {label:'🔍 Prüfen',   bg:'#ede9fe',border:'#7c3aed',color:'#6d28d9'},
-  nicht_notw:  {label:'➖ N/A',       bg:'#f1f5f9',border:'#94a3b8',color:'#64748b'},
+  gruen:       {label:'✅ OK',        it_label:'✅ OK',        bg:'#dcfce7',border:'#16a34a',color:'#15803d'},
+  gelb:        {label:'⚠️ Teilw.',    it_label:'⚠️ Parz.',    bg:'#fef9c3',border:'#ca8a04',color:'#a16207'},
+  rot:         {label:'⛔ Fehlt',     it_label:'⛔ Manca',    bg:'#fee2e2',border:'#dc2626',color:'#b91c1c'},
+  zu_pruefen:  {label:'🔍 Prüfen',   it_label:'🔍 Da verif.',bg:'#ede9fe',border:'#7c3aed',color:'#6d28d9'},
+  nicht_notw:  {label:'➖ N/A',       it_label:'➖ N/A',       bg:'#f1f5f9',border:'#94a3b8',color:'#64748b'},
 };
 
 function _dcEnsure(projId){
@@ -3846,6 +3857,11 @@ function renderDC(){
   auftraege.forEach(p=>{const c=_dcStatusCounts(p.id);totalOk+=c.ok;totalFehlt+=c.fehlt;totalOpen+=c.teilw+c.pruefen+c.none;});
   const stEl=id=>document.getElementById(id);
   if(stEl('dc-stat-total'))stEl('dc-stat-total').textContent=auftraege.length;
+  const _dcL=(id,de,it_)=>{const el=document.getElementById(id);if(el)el.textContent=lang==='it'?it_:de;};
+  _dcL('dc-lbl-total','Aufträge gesamt','Commesse totali');
+  _dcL('dc-lbl-ok','Kriterien OK','Criteri OK');
+  _dcL('dc-lbl-open','Offen / Klärung','Aperto / Chiarimento');
+  _dcL('dc-lbl-fehlt','Fehlt','Mancante');
   if(stEl('dc-stat-ok'))stEl('dc-stat-ok').textContent=totalOk;
   if(stEl('dc-stat-open'))stEl('dc-stat-open').textContent=totalOpen;
   if(stEl('dc-stat-fehlt'))stEl('dc-stat-fehlt').textContent=totalFehlt;
@@ -3903,7 +3919,7 @@ function openDCProject(projId){
   out+=`<div style="background:#fff;border-radius:10px;padding:14px 20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
       <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#0f766e">🏗️ ${esc(proj.name)}</div>${proj.ort?`<div style="font-size:11px;color:#64748b">📍 ${esc(proj.ort)}</div>`:''}</div>
-      <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:${overallPr.pct>=100?'#16a34a':'#0f766e'}">${overallPr.pct}% abgeschlossen</div><div style="font-size:11px;color:#64748b">${overallPr.done}/${overallPr.total} Kriterien OK</div></div>
+      <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:${overallPr.pct>=100?'#16a34a':'#0f766e'}">${overallPr.pct}% abgeschlossen</div><div style="font-size:11px;color:#64748b">${overallPr.done}/${overallPr.total} ${lang==='it'?'Criteri OK':'Kriterien OK'}</div></div>
     </div>
     <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div id="dc-overall-bar" style="height:100%;background:#0d9488;border-radius:4px;transition:width .4s;width:${overallPr.pct}%"></div></div>
     <div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap">
@@ -3914,12 +3930,12 @@ function openDCProject(projId){
   </div>`;
   // Sections
   DC_DATA.forEach(block=>{
-    out+=`<div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.5px;text-transform:uppercase;padding:10px 0 4px;margin-top:4px">${esc(block.blockTitle)}</div>`;
+    out+=`<div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.5px;text-transform:uppercase;padding:10px 0 4px;margin-top:4px">${esc(lang==='it'&&block.it_blockTitle?block.it_blockTitle:block.blockTitle)}</div>`;
     block.sections.forEach(sec=>{
       const sp=_dcSectionProgress(projId,sec.id);
       out+=`<div style="background:#fff;border-radius:10px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">
         <div style="padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,${sec.color}15,#fff)">
-          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:${sec.color}">${esc(sec.title)}</div><div style="font-size:10px;color:#64748b;margin-top:1px">${esc(sec.sub)}</div></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:${sec.color}">${esc(lang==='it'&&sec.it_title?sec.it_title:sec.title)}</div><div style="font-size:10px;color:#64748b;margin-top:1px">${esc(lang==='it'&&sec.it_sub?sec.it_sub:sec.sub)}</div></div>
           <span style="font-size:11px;color:#64748b;white-space:nowrap" id="dc-sec-count-${sec.id}">${sp.done}/${sp.total}</span>
           <div style="width:70px;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden"><div id="dc-sec-prog-${sec.id}" style="height:100%;background:${sec.color};border-radius:3px;width:${sp.pct}%"></div></div>
         </div>`;
@@ -3930,12 +3946,12 @@ function openDCProject(projId){
         out+=`<div style="padding:10px 14px;border-bottom:1px solid #f8faff;${cfg?'background:'+cfg.bg+';':''}">
           <div style="display:flex;align-items:flex-start;gap:10px">
             <div style="flex:1">
-              <div style="font-size:12px;font-weight:600;color:#1e293b;line-height:1.4">${esc(it.t)}</div>
-              <div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.4">${esc(it.d)}</div>
+              <div style="font-size:12px;font-weight:600;color:#1e293b;line-height:1.4">${esc(lang==='it'&&it.it_t?it.it_t:it.t)}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.4">${esc(lang==='it'&&it.it_d?it.it_d:it.d)}</div>
               <textarea onchange="_dcSetNote(${projId},'${it.id}',this.value)" placeholder="Anmerkung …" style="margin-top:5px;width:100%;font-size:11px;border:1px solid #e2e8f0;border-radius:4px;padding:3px 6px;resize:none;height:30px;font-family:inherit;color:#334155;background:#fff">${esc(item.note||'')}</textarea>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:3px;max-width:220px;justify-content:flex-end">
-              ${Object.entries(DC_STATUS_CFG).map(([k,v])=>`<button onclick="_dcSetStatus(${projId},'${it.id}','${k}')" style="padding:3px 8px;border:1.5px solid ${st===k?v.border:'#e2e8f0'};border-radius:5px;background:${st===k?v.bg:'#fff'};color:${st===k?v.color:'#94a3b8'};cursor:pointer;font-size:11px;font-weight:${st===k?'700':'400'};font-family:inherit;white-space:nowrap">${v.label}</button>`).join('')}
+              ${Object.entries(DC_STATUS_CFG).map(([k,v])=>`<button onclick="_dcSetStatus(${projId},'${it.id}','${k}')" style="padding:3px 8px;border:1.5px solid ${st===k?v.border:'#e2e8f0'};border-radius:5px;background:${st===k?v.bg:'#fff'};color:${st===k?v.color:'#94a3b8'};cursor:pointer;font-size:11px;font-weight:${st===k?'700':'400'};font-family:inherit;white-space:nowrap">${lang==='it'&&v.it_label?v.it_label:v.label}</button>`).join('')}
             </div>
           </div>
         </div>`;
